@@ -1,0 +1,64 @@
+<%- all_caps_name = class_name.upcase %>
+#ifndef T_<%= all_caps_name %>
+#define T_<%= all_caps_name %>
+#include "O_<%= class_name %>.hpp"
+namespace DMMM {
+
+class T_<%= class_name %>{
+public:
+    struct Condition{
+        std::string _cond;
+    };
+    
+    <% generated_properties.each do |property| %>
+        struct E_<%= property.name %>{
+            E_<%= property.name %>() { _field = "<%= property.name %>" ;}
+            std::string _field;
+            typedef T_<%= class_name %>::Condition ConditionType;
+            typedef F_<%= property.type %>::Base ComparerType;
+        };
+    <% end %>    
+
+    static void getFields(std::vector<std::string>& rFields)
+    {
+        rFields.clear();
+        <% generated_properties.each do |property| %>
+        rFields.push_back("<%= property.name %>");
+        <% end %>
+    }
+
+    static void select(const Condition& c, 
+                       const std::string& additional,
+                       std::vector<O_<%= class_name %>>& r)
+    {
+        std::vector<std::string> fields;
+        getFields(fields);
+        QueryRes res;
+        DBFace::instance()->select("<%= storage_name %>",
+                                   fields, c._cond, additional, res);
+        for(size_t i = 0; i < res.size(); ++i){
+            r.resize(r.size() + 1);
+            <% generated_properties.each do |property| %>
+            r.back()._f_<%= property.name %>._base = 
+                fromString<F_<%= property.type %>::Base>(res[i]["<%= property.name %>"]);
+            <% end %>
+        }
+    }
+
+    static O_<%= class_name %> first(const Condition& c){
+        std::vector<O_<%= class_name %>> r;
+        select(c, "limit = 1", r);
+        if(r.size() > 0)
+            return r[0];
+        else
+            return O_<%= class_name %>();
+    }
+
+    static O_<%= class_name %> first(){
+        return first(Condition());
+    }
+
+};
+
+}; //namespace DMMM
+#endif //T_<%= all_caps_name %>

@@ -1,0 +1,64 @@
+<%- all_caps_name = class_name.upcase %>
+#ifndef O_<%= all_caps_name %>
+#define O_<%= all_caps_name %>
+
+#include <map>
+#include <string>
+#include "utils.hpp"
+#include "dbface.h"
+#include "dmmm_identifiers.hpp"
+#include "dmmm_fields.hpp"
+#include "dmmm_comparators.hpp"
+namespace DMMM {
+
+class O_<%= class_name %>{
+public:
+    <% generated_properties.each do |property| %>
+    const F_<% property.type %>::Base& _<%= property.name %>() const { 
+        return _f_<%= property.name %>._base; 
+    }
+    F_<%= property.type %>::Base& _<%= property.name %>() { 
+        _f_<%= property.type %>._dirty = true; 
+        return _f_<%= property.name %>._base; 
+    }
+
+    <% end %>
+
+    bool update(){
+        std::map<std::string, std::string> field2Val;
+        <% generated_properties.each do |property| %>
+        if (_f_<%= property.name %>._dirty)
+            field2Val["<%= property.name %>"] = 
+                toString(_f_<%= property.name %>._base);
+        <% end %>
+        std::string where;
+        <%- if serial %>
+        where = "<%= serial.name %>=" + toString(_f_<%= serial.name %>._base);
+        <% end %>
+        return DBFace::instance()->update("<%= storage_name %>", 
+                                          field2Val, where);
+    }
+
+
+    bool insert(){
+        std::map<std::string, std::string> field2Val;
+        <% generated_properties.each do |property| %>
+        if (_f_<%= property.name %>._dirty)
+            field2Val["<%= property.name %>"] = 
+                toString(_f_<%= property.name %>._base);
+        <% end %>
+        return DBFace::instance()->insert("<%= storage_name %>", field2Val);
+    }
+
+
+private:
+    <% generated_properties.each do |property| %>
+        F_int _f_<%= property.name %>;
+    <% end %>
+
+
+    friend class T_<%= class_name %>;
+};
+
+}; //namespace DMMM
+#endif //O_<%= all_caps_name %>

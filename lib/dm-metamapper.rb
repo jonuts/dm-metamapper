@@ -18,6 +18,17 @@ module DataMapper
       end
 
       def generate(format)
+        klasses = [ Generator[format] ]
+        klasses << klasses[0].subclasses if klasses[0].subclasses.any?
+          
+        klasses.each do |k|
+          temp_filename = [File.dirname(__FILE__), k.generator_name.to_s, k.template].join('/')
+          result_filename = k.file_name_prefix + self.class.name.to_s + k.file_name_suffix
+          if File.exists(temp_filename)
+            template = ERB.new(File.read(temp_filename))
+            File.open(result_filename, 'w') { |f| f << template.result }
+          end
+        end
       end
 
       def generated_properties
@@ -62,6 +73,24 @@ module DataMapper
       end
     end
   end
+end
+
+class DataMapper::MetaMapper::Generator::CPP < DataMapper::MetaMapper::Generator
+  name :cpp
+end
+
+class DataMapper::MetaMapper::Generator::CPP_Class < DataMapper::MetaMapper::Generator::CPP  
+
+  file_name_prefix "T_"  
+  file_name_suffix ".hpp"
+  template "class.hpp.erb"
+end
+
+class DataMapper::MetaMapper::Generator::CPP_Instance < DataMapper::MetaMapper::Generator::CPP
+  file_name_prefix "O_"  
+  file_name_suffix ".hpp"
+
+  template "instance.hpp.erb"
 end
 
 class DataMapper::MetaMapper::Generator::JS < DataMapper::MetaMapper::Generator
