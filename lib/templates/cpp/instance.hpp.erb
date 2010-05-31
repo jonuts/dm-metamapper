@@ -1,5 +1,5 @@
-<%- class_name = self.name %>
-<%- all_caps_name = class_name.upcase %>
+<% class_name = self.name %>
+<% all_caps_name = class_name.upcase %>
 #ifndef O_<%= all_caps_name %>
 #define O_<%= all_caps_name %>
 
@@ -33,7 +33,7 @@ public:
                 toString(_f_<%= property.name %>._base);
         <% end %>
         std::string where;
-        <%- if serial %>
+        <% if serial %>
         where = "<%= serial.name %>=" + toString(_f_<%= serial.name %>._base);
         <% end %>
         return DBFace::instance()->update("<%= storage_name %>", 

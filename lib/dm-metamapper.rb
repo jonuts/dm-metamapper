@@ -1,6 +1,6 @@
 require 'dm-core'
 
-#DataMapper::Property.accepts_options :skip_generation
+DataMapper::Property.accept_options :skip_generation
 
 module DataMapper
   module MetaMapper
@@ -27,7 +27,8 @@ module DataMapper
           if File.exists?(temp_filename)
             puts "writing file " + result_filename
             template = ERB.new(File.read(temp_filename))
-            File.open(result_filename, 'w') { |f| f << template.result }
+            result = template.result binding
+            File.open(result_filename, 'w') { |f| f << result }
           else
             puts "ERROR: " + temp_filename + " does not exist"
           end
@@ -36,7 +37,7 @@ module DataMapper
 
       def generated_properties
         @_generated_properties ||= properties.select {|prop|
-          !prop.opts[:skip_generation]
+          !prop.options[:skip_generation]
         }
       end
 
@@ -61,18 +62,19 @@ module DataMapper
           return @file_name_prefix unless prefix
           @file_name_prefix = prefix
         end
+
         def file_name_suffix(suffix = nil)
           return @file_name_suffix unless suffix
           @file_name_suffix = suffix
         end
 
-        protected
-        
         def template(template=nil)
           return @template unless template
           @template = template
         end
 
+        protected
+        
         def name(name)
           @generator_name = name
         end
