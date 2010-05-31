@@ -1,6 +1,6 @@
 require 'dm-core'
 
-DataMapper::Property.accepts_options :skip_generation
+#DataMapper::Property.accepts_options :skip_generation
 
 module DataMapper
   module MetaMapper
@@ -19,14 +19,17 @@ module DataMapper
 
       def generate(format)
         klasses = [ Generator[format] ]
-        klasses << klasses[0].subclasses if klasses[0].subclasses.any?
-          
-        klasses.each do |k|
-          temp_filename = [File.dirname(__FILE__), k.generator_name.to_s, k.template].join('/')
-          result_filename = k.file_name_prefix + self.class.name.to_s + k.file_name_suffix
-          if File.exists(temp_filename)
+        klasses += klasses[0].subclasses if klasses[0].subclasses.any?
+
+        klasses.select(&:template).each do |k|
+          temp_filename = [File.dirname(__FILE__), "templates", k.generator_name.to_s, k.template].join('/')
+          result_filename = File.dirname(__FILE__) + "/../output/" + k.file_name_prefix + self.name.to_s + k.file_name_suffix
+          if File.exists?(temp_filename)
+            puts "writing file " + result_filename
             template = ERB.new(File.read(temp_filename))
             File.open(result_filename, 'w') { |f| f << template.result }
+          else
+            puts "ERROR: " + temp_filename + " does not exist"
           end
         end
       end
@@ -54,6 +57,15 @@ module DataMapper
           @subclasses.find {|klass| klass.generator_name == generator}
         end
 
+        def file_name_prefix(prefix = nil)
+          return @file_name_prefix unless prefix
+          @file_name_prefix = prefix
+        end
+        def file_name_suffix(suffix = nil)
+          return @file_name_suffix unless suffix
+          @file_name_suffix = suffix
+        end
+
         protected
         
         def template(template=nil)
@@ -68,7 +80,9 @@ module DataMapper
         private
 
         def inherited(klass)
+          @subclasses ||= []
           @subclasses << klass
+          klass.instance_variable_set(:@generator_name, @generator_name)
         end
       end
     end
