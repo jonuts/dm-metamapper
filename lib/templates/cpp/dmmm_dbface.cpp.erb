@@ -1,0 +1,139 @@
+#include "dmmm_dbface.h"
+#include "dmmm_utils.hpp"
+using namespace mysqlpp;
+using namespace std;
+using namespace DMMM;
+
+DBFace* DBFace::_this = NULL;
+
+DBFace::DBFace(const string& database, const string& host, 
+	       const string& user, const string& password)
+{
+    _this = this;
+    if (!_connection.connect(database.c_str(), host.c_str(), 
+			     user.c_str(), password.c_str())){
+        cerr << "Could not connect to DB";
+        exit(-1);
+    }     
+}
+
+bool
+DBFace::select(const std::string& table, 
+	       const std::vector<string>& columns,
+	       const std::string& where, 
+	       const std::string& additional, 
+	       QueryRes& rRes)
+{
+    boost::mutex::scoped_lock lock(_mutex);
+
+    Query q = _connection.query();
+    
+    q << "SELECT ";
+    for (size_t i = 0; i < columns.size(); ++i){
+	if (i > 0)
+	    q << ",";
+	q << columns[i];
+    }
+    q << " FROM " << table;
+    if (where.size())
+	q << " WHERE " << where;
+    if (additional.size())
+	q << " " << additional;
+//    cout << q << endl;
+    StoreQueryResult mysqlRes;
+    try{
+	mysqlRes = q.store();
+    }
+    catch (const mysqlpp::Exception& er) {
+        cerr << "Query failed: " << q << endl << er.what();
+        return false;
+    }
+    
+    for (size_t i = 0; i < mysqlRes.num_rows(); ++i){
+	rRes.resize(rRes.size() + 1);
+	for (size_t j = 0; j < columns.size(); ++j)
+	    rRes.back()[columns[j]] = toString(mysqlRes[i][columns[j].c_str()]);
+    }
+    return true;
+}
+
+
+bool
+DBFace::executeQuery(Query& q)
+{
+    boost::mutex::scoped_lock lock(_mutex);
+    try{
+        q.execute();
+    }
+    catch (const mysqlpp::Exception& er) {
+        cerr << "Query failed: " << q << endl << er.what();
+        return false;
+    }
+    return true;
+}
+
+bool 
+DBFace::insert(const string& table, 
+	       const map<string, string>& field2Val)
+{
+    if (field2Val.size() == 0)
+	return true;
+
+    Query q = _connection.query();
+    q << "INSERT INTO " << table << " (";
+    for (map<string, string>::const_iterator it = field2Val.begin(); 
+	 it != field2Val.end(); ++it)
+    {
+	if (it != field2Val.begin())
+	    q << ",";
+	q << it->first;
+    }
+    q << ")VALUES(";
+    for (map<string, string>::const_iterator it = field2Val.begin(); 
+	 it != field2Val.end(); ++it)
+    {
+	if (it != field2Val.begin())
+	    q << ",";
+	q << quote << it->second;
+    }
+    q << ")";
+    return executeQuery(q);
+}
+
+bool
+DBFace::update(const string& table, 
+	       const map<string, string>& field2Val,
+	       const string& where)
+{
+    Query q = _connection.query();
+    
+    q << "UPDATE " << table << " SET ";
+    for (map<string, string>::const_iterator it = field2Val.begin();
+	 it != field2Val.end(); ++it)
+    {
+	if (it != field2Val.begin())
+	    q << ",";
+	q << it->first << "=" << quote << it->second;
+    }
+    if (where.size())
+	q << " WHERE " << where;
+//    cout << q << endl;
+    return executeQuery(q);
+}
+
+string 
+DBFace::now()
+{
+    Query q = _connection.query();
+    
+    q << "SELECT NOW()";
+    StoreQueryResult mysqlRes;
+    try{
+	mysqlRes = q.store();
+    }
+    catch (const mysqlpp::Exception& er) {
+        cerr << "Query failed: " << q << endl << er.what();
+        return string();
+    }
+    return toString(mysqlRes[0]["now()"]);
+}

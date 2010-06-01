@@ -1,0 +1,43 @@
+#ifndef DBFACE_H
+#define DBFACE_H
+
+#include <map>
+#include <mysql++.h>
+#include <boost/thread/mutex.hpp>
+
+namespace DMMM {
+
+typedef std::vector<std::map<std::string, std::string> > QueryRes;
+
+class DBFace{
+public:
+    static DBFace* instance() { return _this; }
+    
+    DBFace(const std::string& database, const std::string& host, 
+	   const std::string& user, const std::string& password);
+    
+    bool insert(const std::string& table, 
+		const std::map<std::string, std::string>& field2Val);
+    bool update(const std::string& table, 
+		const std::map<std::string, std::string>& field2Val,
+		const std::string& where);
+    bool select(const std::string& table, 
+		const std::vector<std::string>& columns,
+		const std::string& where,
+		const std::string& additional,		
+		QueryRes& rRes);
+    
+    std::string now(); 
+    
+private:
+    bool executeQuery(mysqlpp::Query& rQuery);
+    
+private:
+    mysqlpp::Connection                 _connection;
+    mutable boost::mutex                _mutex;
+    static DBFace*                      _this;		
+};
+
+} //namespace DMMM
+
+#endif //DB_H

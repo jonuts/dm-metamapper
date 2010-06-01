@@ -1,0 +1,27 @@
+#ifndef DMMM_FIELDS_H
+#define DMMM_FIELDS_H
+
+#include <string>
+
+#include <sstream>
+
+#include "utils.hpp"
+
+namespace DMMM {
+
+template<class T>
+struct Field{
+    Field<T>() :_dirty(false) {}
+    typedef T Base;
+    bool _dirty;
+    T _base;
+}; //class Field
+
+typedef Field<int> F_Integer;
+typedef Field<double> F_Float;
+typedef Field<std::string> F_String;
+typedef Field<bool> F_TrueString;
+
+} //namespace DMMM
+
+#endif //DMMM_FIELDS_H

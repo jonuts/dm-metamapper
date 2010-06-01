@@ -15,11 +15,11 @@ namespace DMMM {
 class O_<%= class_name %>{
 public:
     <% generated_properties.each do |property| %>
-    const F_<% property.type %>::Base& _<%= property.name %>() const { 
+    const F_<%= property.class.primitive %>::Base& _<%= property.name %>() const { 
         return _f_<%= property.name %>._base; 
     }
-    F_<%= property.type %>::Base& _<%= property.name %>() { 
-        _f_<%= property.type %>._dirty = true; 
+    F_<%= property.class.primitive %>::Base& _<%= property.name %>() { 
+        _f_<%= property.class.primitive %>._dirty = true; 
         return _f_<%= property.name %>._base; 
     }
 
@@ -54,7 +54,7 @@ public:
 
 private:
     <% generated_properties.each do |property| %>
-        F_int _f_<%= property.name %>;
+        F_<%= property.class.primitive %> _f_<%= property.name %>;
     <% end %>
 
 

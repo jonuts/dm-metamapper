@@ -12,12 +12,12 @@ public:
     };
     
     <% generated_properties.each do |property| %>
-        struct E_<%= property.name %>{
-            E_<%= property.name %>() { _field = "<%= property.name %>" ;}
-            std::string _field;
-            typedef T_<%= class_name %>::Condition ConditionType;
-            typedef F_<%= property.type %>::Base ComparerType;
-        };
+    struct E_<%= property.name %>{
+        E_<%= property.name %>() { _field = "<%= property.name %>" ;}
+        std::string _field;
+        typedef T_<%= class_name %>::Condition ConditionType;
+        typedef F_<%= property.class.primitive %>::Base ComparerType;
+    };
     <% end %>    
 
     static void getFields(std::vector<std::string>& rFields)
@@ -37,11 +37,11 @@ public:
         QueryRes res;
         DBFace::instance()->select("<%= storage_name %>",
                                    fields, c._cond, additional, res);
+        r.resize(r.size() + res.size());
         for(size_t i = 0; i < res.size(); ++i){
-            r.resize(r.size() + 1);
             <% generated_properties.each do |property| %>
             r.back()._f_<%= property.name %>._base = 
-                fromString<F_<%= property.type %>::Base>(res[i]["<%= property.name %>"]);
+                fromString<F_<%= property.class.primitive %>::Base>(res[i]["<%= property.name %>"]);
             <% end %>
         }
     }

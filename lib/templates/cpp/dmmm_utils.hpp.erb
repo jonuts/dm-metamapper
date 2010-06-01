@@ -1,0 +1,42 @@
+#ifndef DMMM_UTILS_HPP
+#define DMMM_UTILS_HPP
+
+#include <vector>
+#include <map>
+#include <sstream>
+
+namespace DMMM {
+
+template<class T>
+std::string
+toString(const T& t)
+{
+    std::ostringstream oss;
+    oss << t;
+    
+    return oss.str();
+}
+
+template<class T>
+T
+fromString(const std::string& s)
+{
+    std::istringstream iss;
+    iss.str(s);
+    
+    T ret;
+    iss >> ret;
+    
+    return ret;
+}
+
+template<>
+std::string
+fromString<std::string>(const std::string& s)
+{
+    return s;
+}
+
+} //namespace DMMM
+
+#endif //DMMM_UTILS_HPP
