@@ -26,9 +26,10 @@ class Dog
   belongs_to :user
   has n,     :little_fleas
 
-  property :id,     Serial
-  property :name,   String
-  property :stinks, Boolean
+  property :id,       Serial
+  property :user_id,  Integer
+  property :name,     String
+  property :stinks,   Boolean
 end
 
 class LittleFlea
@@ -37,5 +38,6 @@ class LittleFlea
  
   belongs_to :dog
 
-  property :id,     Serial
+  property :id,       Serial
+  property :dog_id,   Integer
 end
