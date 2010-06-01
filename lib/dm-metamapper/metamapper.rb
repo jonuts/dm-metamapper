@@ -9,25 +9,27 @@ module DataMapper
 
       def generate(format, context=nil)
         type, _binding = if context
-          [:generated_model_files, context.send(:binding)]
+          [:generated_model_files, context._get_binding]
         else
           [:generated_global_files, binding]
         end
+
+        puts _binding.eval("self")
 
         generator = Generator[format]
 
         generator.send(type).each do |generated_file|
           temp_filename = [
             File.dirname(__FILE__), 
-            "templates", 
-            generated_file.generator_name, 
+            "../templates", 
+            generator.generator_name, 
             generated_file.template
           ].join('/')
 
           result_base_name = context ? context.name.to_s : generated_file.template.sub(/\.erb$/,'')
 
           result_filename = File.join(
-            File.dirname(__FILE__), "../output", [
+            File.dirname(__FILE__), "../../output", [
               generated_file.file_name_prefix,
               result_base_name,
               generated_file.file_name_suffix
@@ -45,7 +47,7 @@ module DataMapper
         end
 
         if !context
-          generator.models.select {|model| 
+          models.select {|model| 
             model.generates?(format)
           }.each {|model| 
             model.generate(format)

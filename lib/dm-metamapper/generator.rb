@@ -1,14 +1,32 @@
 module DataMapper
   module MetaMapper
     class Generator
-      GeneratedFile = Struct.new(:template, :file_name_prefix, :file_name_suffix)
+      class GeneratedFile
+        def initialize(&blk)
+          instance_eval(&blk) if block_given?
+        end
+
+        attr_reader :template, :file_name_prefix, :file_name_suffix
+
+        def template_name(template)
+          @template = template
+        end
+
+        def prefix(str)
+          @file_name_prefix = str
+        end
+
+        def suffix(str)
+          @file_name_suffix = str
+        end
+      end
 
       @subclasses = []
 
       class << self
         attr_reader :subclasses,
                     :generator_name,
-                    :generated_model_files
+                    :generated_model_files,
                     :generated_global_files
 
         def [](generator)
@@ -37,14 +55,14 @@ module DataMapper
 
         protected
 
-        def generates_file
+        def generates_file(&blk)
           @generated_model_files ||= []
-          @generated_model_files << yield(GeneratedFile.new)
+          @generated_model_files << GeneratedFile.new(&blk)
         end
 
-        def generates_global_file
+        def generates_global_file(&blk)
           @generated_global_files ||= []
-          @generated_global_files << yield(GeneratedFile.new)
+          @generated_global_files << GeneratedFile.new(&blk)
         end
 
         private
@@ -60,20 +78,22 @@ module DataMapper
 end
 
 class DataMapper::MetaMapper::Generator::CPP < DataMapper::MetaMapper::Generator
-  name :cpp
+  generator_name :cpp
 
   generates_global_file do |f|
-    f.template = "dmmm_identifiers.hpp"
+    template_name "dmmm_identifiers.hpp.erb"
   end
 
   generates_file do |f|
-    f.file_name_suffix = ".hpp"
+    suffix ".hpp"
+    prefix "O_"
+    template_name "instance.hpp.erb"
   end
 
   generates_file do |f|
-    f.file_name_suffix ".hpp"
-    f.file_name_prefix "T_"
-    f.template "class.hpp.erb"
+    suffix".hpp"
+    prefix "T_"
+    template_name "class.hpp.erb"
   end
 end
 

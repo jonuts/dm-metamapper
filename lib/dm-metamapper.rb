@@ -1,3 +1,5 @@
+$:.push File.dirname(__FILE__)
+
 require 'dm-core'
 require 'dm-metamapper/property'
 require 'dm-metamapper/metamapper'

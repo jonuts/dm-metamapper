@@ -19,6 +19,10 @@ module DataMapper
         }
       end
 
+      def _get_binding
+        binding
+      end
+
       def self.extended(base)
         DataMapper::MetaMapper.register(base)
         base.instance_variable_set(:@_generation_formats, [])
