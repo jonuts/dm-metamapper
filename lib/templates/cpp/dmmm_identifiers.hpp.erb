@@ -1,0 +1,15 @@
+#ifndef DMMM_IDENTIFIERS_HPP
+#define DMMM_IDENTIFIERS_HPP
+
+#include "dmmm_id.hpp"
+
+namespace DMMM {
+
+<% models.each do |model| %>
+class DummyO_<%= model.name %>;
+typedef Id<DummyO_<%= model.name %>> I_<%= model.name %>;
+<% end %>
+
+
+} //namespace DMMM
+#endif //DMMM_IDENTIFIERS_HPP
