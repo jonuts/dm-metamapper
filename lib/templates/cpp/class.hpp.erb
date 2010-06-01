@@ -37,22 +37,28 @@ public:
         QueryRes res;
         DBFace::instance()->select("<%= storage_name %>",
                                    fields, c._cond, additional, res);
-        r.resize(r.size() + res.size());
+        r.resize(res.size());
         for(size_t i = 0; i < res.size(); ++i){
             <% generated_properties.each do |property| %>
-            r.back()._f_<%= property.name %>._base = 
+            r[i]._f_<%= property.name %>._base = 
                 fromString<F_<%= property.class.primitive %>::Base>(res[i]["<%= property.name %>"]);
             <% end %>
         }
     }
 
+    static void select(const Condition& c, 
+                       std::vector<O_<%= class_name %>>& r)
+    {
+        select(c, "", r);
+    }
+
     static std::pair<O_<%= class_name %>, bool> first(const Condition& c){
         std::vector<O_<%= class_name %>> r;
-        select(c, "limit = 1", r);
+        select(c, "limit 1", r);
         if(r.size() > 0)
-            return make_pair(r[0], true);
+            return std::make_pair(r[0], true);
         else
-            return make_pair(O_<%= class_name %>(), false);
+            return std::make_pair(O_<%= class_name %>(), false);
     }
 
     static std::pair<O_<%= class_name %>, bool> first(){
@@ -65,16 +71,16 @@ public:
 class T_<%= class_name %>_Constrained : public T_<%= class_name %>{
 
 public:
-    static void select(const Condition& c, 
+    void select(const Condition& c, 
                        const std::string& additional,
                        std::vector<O_<%= class_name %>>& r)
     {		      
         T_<%= class_name %>::select(c && _constraint, additional, r);
     }
-    static std::pair<O_<%= class_name %>, bool> first(const Condition& c){
+    std::pair<O_<%= class_name %>, bool> first(const Condition& c){
         return T_<%= class_name %>::first(c && _constraint);
     }    
-    static std::pair<O_<%= class_name %>, bool> first(){
+    std::pair<O_<%= class_name %>, bool> first(){
         return T_<%= class_name %>::first(_constraint);
     }
 

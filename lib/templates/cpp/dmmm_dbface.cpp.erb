@@ -39,7 +39,7 @@ DBFace::select(const std::string& table,
 	q << " WHERE " << where;
     if (additional.size())
 	q << " " << additional;
-//    cout << q << endl;
+    cout << q << endl;
     StoreQueryResult mysqlRes;
     try{
 	mysqlRes = q.store();
@@ -72,9 +72,23 @@ DBFace::executeQuery(Query& q)
     return true;
 }
 
+bool
+DBFace::getLastInsertId(Query& rQuery, int& rId)
+{
+    try{
+        rId = rQuery.insert_id();
+        cout << "got last insert ID: " << rId << endl;
+    }
+    catch (const mysqlpp::Exception& er) {
+        return false;
+    }
+    return true;
+}
+
 bool 
 DBFace::insert(const string& table, 
-	       const map<string, string>& field2Val)
+	       const map<string, string>& field2Val,
+	       int& rInsertId)
 {
     if (field2Val.size() == 0)
 	return true;
@@ -97,7 +111,10 @@ DBFace::insert(const string& table,
 	q << quote << it->second;
     }
     q << ")";
-    return executeQuery(q);
+    cout << q << endl;
+    bool ok = executeQuery(q);
+    ok = ok && getLastInsertId(q, rInsertId);
+    return ok;
 }
 
 bool
@@ -117,7 +134,7 @@ DBFace::update(const string& table,
     }
     if (where.size())
 	q << " WHERE " << where;
-//    cout << q << endl;
+    cout << q << endl;
     return executeQuery(q);
 }
 

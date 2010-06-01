@@ -4,8 +4,10 @@ require "bundler"
 Bundler.setup(:default, :test)
 require "dm-core"
 require "lib/dm-metamapper.rb"
+require "dm-migrations"
 
-DataMapper.setup(:default, "sqlite3::memory:")
+#DataMapper.setup(:default, "sqlite3::memory:")
+DataMapper.setup(:default, "mysql://root@localhost/dmmm")
 
 class User
   include DataMapper::Resource

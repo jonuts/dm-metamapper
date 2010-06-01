@@ -80,9 +80,14 @@ end
 class DataMapper::MetaMapper::Generator::CPP < DataMapper::MetaMapper::Generator
   generator_name :cpp
 
-  generates_global_file do |f|
-    template_name "dmmm_identifiers.hpp.erb"
-  end
+  generates_global_file{ template_name "dmmm_identifiers.hpp.erb" }
+  generates_global_file{ template_name "dmmm_comparators.hpp.erb" }
+  generates_global_file{ template_name "dmmm_fields.hpp.erb" }
+  generates_global_file{ template_name "dmmm_utils.hpp.erb" }
+  generates_global_file{ template_name "dmmm_utils.cpp.erb" }
+  generates_global_file{ template_name "dmmm_dbface.cpp.erb" }
+  generates_global_file{ template_name "dmmm_dbface.h.erb" }
+  generates_global_file{ template_name "dmmm_id.hpp.erb" }
 
   generates_file do |f|
     suffix ".hpp"

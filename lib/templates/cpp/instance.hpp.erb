@@ -11,8 +11,11 @@
 #include "dmmm_fields.hpp"
 #include "dmmm_comparators.hpp"
 <% self.relationships.select{|r,m| m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'}.each do |relative| %>
-#include "T_<%= relative[0].to_const_string %>.hpp"
+#include "T_<%= relative[1].parent_model.to_s %>.hpp"
 <% end %>
+
+<%# self.relationships.select{|r,m| m.class.name == 'DataMapper::Associations::OneToMany::Relationship'}.each do |relative| %>
+<%# end %>
 namespace DMMM {
 
 class O_<%= class_name %>{
@@ -22,7 +25,7 @@ public:
         return _f_<%= property.name %>._base; 
     }
     F_<%= property.class.primitive %>::Base& _<%= property.name %>() { 
-        _f_<%= property.class.primitive %>._dirty = true; 
+        _f_<%= property.name %>._dirty = true; 
         return _f_<%= property.name %>._base; 
     }
 
@@ -42,7 +45,6 @@ public:
                                           field2Val, where);
     }
 
-    size_t id() { return _<%= serial.name %>; }
     <% end %>
 
 
@@ -53,28 +55,37 @@ public:
             field2Val["<%= property.name %>"] = 
                 toString(_f_<%= property.name %>._base);
         <% end %>
-        return DBFace::instance()->insert("<%= storage_name %>", field2Val);
+        <% if serial %>
+        return DBFace::instance()->insert("<%= storage_name %>", field2Val,
+                                          _f_<%= serial.name %>._base);
+	<% else %>
+        size_t id;
+        return DBFace::instance()->insert("<%= storage_name %>", field2Val,
+                                          id);
+        <% end %>
+ 				   
     }
 
     <% self.relationships.select{|r,m| m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'}.each do |r| %> 
     <% parent = r[0].to_const_string %>
     std::pair<O_<%= parent %>, bool> <%= r[0] %>(){
-        T_<%= parent %>_Constrained T(E_<%= r[1].parent_key.first.name.to_s %> == _f_<%= r[1].child_key.first.name.to_s %>);
+        T_<%= parent %>_Constrained T(T_<%= parent %>::E_<%= r[1].parent_key.first.name.to_s %>() == _<%= r[1].child_key.first.name.to_s %>());
 	return T.first();
     }
     <% end %>
 
+/*
     <% self.relationships.select{|r,m| m.class.name == 'DataMapper::Associations::OneToMany::Relationship'}.each do |r| %> 
     <% child = r[0].to_const_string %>
     T_<%= child %>_Constrained <%= r[0] %>(){
         return T_<%= child %>_Constrained(E_<%= r[1].child_key.first.name.to_s %> == _f_<%= r[1].parent_key.first.name.to_s %>);
     }
     <% end %>
-
+*/
 
 private:
     <% generated_properties.each do |property| %>
-        F_<%= property.class.primitive %> _f_<%= property.name %>;
+    F_<%= property.class.primitive %> _f_<%= property.name %>;
     <% end %>
 
 

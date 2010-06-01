@@ -1,0 +1,11 @@
+#include "dmmm_utils.hpp"
+
+namespace DMMM {
+template<>
+std::string
+fromString<std::string>(const std::string& s)
+{
+    return s;
+}
+
+} //namespace DMMM
