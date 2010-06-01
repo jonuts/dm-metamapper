@@ -1,7 +1,7 @@
 require "erb"
 require "rubygems"
 require "bundler"
-Bundler.setup
+Bundler.setup(:default, :test)
 require "dm-core"
 require "lib/dm-metamapper.rb"
 
@@ -10,6 +10,8 @@ DataMapper.setup(:default, "sqlite3::memory:")
 class User
   include DataMapper::Resource
   extend DataMapper::MetaMapper::Extension
+
+  generates :cpp
 
   has n,    :dogs
 
@@ -23,6 +25,8 @@ class Dog
   include DataMapper::Resource
   extend DataMapper::MetaMapper::Extension
 
+  generates :cpp
+
   belongs_to :user
   has n,     :little_fleas
 
@@ -35,6 +39,8 @@ end
 class LittleFlea
   include DataMapper::Resource
   extend DataMapper::MetaMapper::Extension
+
+  generates :cpp
  
   belongs_to :dog
 
