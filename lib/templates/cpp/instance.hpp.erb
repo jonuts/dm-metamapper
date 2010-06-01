@@ -5,11 +5,14 @@
 
 #include <map>
 #include <string>
-#include "utils.hpp"
-#include "dbface.h"
+#include "dmmm_utils.hpp"
+#include "dmmm_dbface.h"
 #include "dmmm_identifiers.hpp"
 #include "dmmm_fields.hpp"
 #include "dmmm_comparators.hpp"
+<% self.relationships.select{|r,m| m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'}.each do |relative| %>
+#include "T_<%= relative[0].to_const_string %>.hpp"
+<% end %>
 namespace DMMM {
 
 class O_<%= class_name %>{
@@ -25,6 +28,7 @@ public:
 
     <% end %>
 
+    <% if serial %>
     bool update(){
         std::map<std::string, std::string> field2Val;
         <% generated_properties.each do |property| %>
@@ -32,13 +36,12 @@ public:
             field2Val["<%= property.name %>"] = 
                 toString(_f_<%= property.name %>._base);
         <% end %>
-        std::string where;
-        <% if serial %>
-        where = "<%= serial.name %>=" + toString(_f_<%= serial.name %>._base);
-        <% end %>
+        std::string where =
+	    "<%= serial.name %>=" + toString(_f_<%= serial.name %>._base);
         return DBFace::instance()->update("<%= storage_name %>", 
                                           field2Val, where);
     }
+    <% end %>
 
 
     bool insert(){
@@ -50,7 +53,13 @@ public:
         <% end %>
         return DBFace::instance()->insert("<%= storage_name %>", field2Val);
     }
-
+/*
+    <% self.relationships.select{|r,m| m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'}.each do |relative| %>
+    std::pair<O_<%= relative[0].to_const_string %>, bool> <%= relative[0] %>(){
+        return T_<%= relative[0].to_const_string %>::first(E_<%= serial.name %> == _f_
+    }
+    <% end %>
+*/
 
 private:
     <% generated_properties.each do |property| %>

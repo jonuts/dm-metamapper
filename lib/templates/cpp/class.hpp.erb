@@ -46,16 +46,16 @@ public:
         }
     }
 
-    static O_<%= class_name %> first(const Condition& c){
+    static std::pair<O_<%= class_name %>, bool> first(const Condition& c){
         std::vector<O_<%= class_name %>> r;
         select(c, "limit = 1", r);
         if(r.size() > 0)
-            return r[0];
+            return make_pair(r[0], true);
         else
-            return O_<%= class_name %>();
+            return make_pair(O_<%= class_name %>(), false);
     }
 
-    static O_<%= class_name %> first(){
+    static std::pair<O_<%= class_name %>, bool> first(){
         return first(Condition());
     }
 
