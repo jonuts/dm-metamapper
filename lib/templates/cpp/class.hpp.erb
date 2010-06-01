@@ -61,5 +61,29 @@ public:
 
 };
 
+
+class T_<%= class_name %>_Constrained : public T_<%= class_name %>{
+
+public:
+    static void select(const Condition& c, 
+                       const std::string& additional,
+                       std::vector<O_<%= class_name %>>& r)
+    {		      
+        T_<%= class_name %>::select(c && _constraint, additional, r);
+    }
+    static std::pair<O_<%= class_name %>, bool> first(const Condition& c){
+        return T_<%= class_name %>::first(c && _constraint);
+    }    
+    static std::pair<O_<%= class_name %>, bool> first(){
+        return T_<%= class_name %>::first(_constraint);
+    }
+
+    T_<%= class_name %>_Constrained(const Condition& c) : _constraint(c) {}
+
+private:
+    Condition   _constraint;    
+
+};
+
 }; //namespace DMMM
 #endif //T_<%= all_caps_name %>

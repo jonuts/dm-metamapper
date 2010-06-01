@@ -41,6 +41,8 @@ public:
         return DBFace::instance()->update("<%= storage_name %>", 
                                           field2Val, where);
     }
+
+    size_t id() { return _<%= serial.name %>; }
     <% end %>
 
 
@@ -53,13 +55,22 @@ public:
         <% end %>
         return DBFace::instance()->insert("<%= storage_name %>", field2Val);
     }
-/*
-    <% self.relationships.select{|r,m| m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'}.each do |relative| %>
-    std::pair<O_<%= relative[0].to_const_string %>, bool> <%= relative[0] %>(){
-        return T_<%= relative[0].to_const_string %>::first(E_<%= serial.name %> == _f_
+
+    <% self.relationships.select{|r,m| m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'}.each do |r| %> 
+    <% parent = r[0].to_const_string %>
+    std::pair<O_<%= parent %>, bool> <%= r[0] %>(){
+        T_<%= parent %>_Constrained T(E_<%= r[1].parent_key.first.name.to_s %> == _f_<%= r[1].child_key.first.name.to_s %>);
+	return T.first();
     }
     <% end %>
-*/
+
+    <% self.relationships.select{|r,m| m.class.name == 'DataMapper::Associations::OneToMany::Relationship'}.each do |r| %> 
+    <% child = r[0].to_const_string %>
+    T_<%= child %>_Constrained <%= r[0] %>(){
+        return T_<%= child %>_Constrained(E_<%= r[1].child_key.first.name.to_s %> == _f_<%= r[1].parent_key.first.name.to_s %>);
+    }
+    <% end %>
+
 
 private:
     <% generated_properties.each do |property| %>
