@@ -24,9 +24,18 @@ class Dog
   extend DataMapper::MetaMapper::Extension
 
   belongs_to :user
+  has n,     :little_fleas
 
   property :id,     Serial
   property :name,   String
   property :stinks, Boolean
 end
 
+class LittleFlea
+  include DataMapper::Resource
+  extend DataMapper::MetaMapper::Extension
+ 
+  belongs_to :dog
+
+  property :id,     Serial
+end
