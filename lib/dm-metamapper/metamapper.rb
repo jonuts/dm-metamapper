@@ -8,15 +8,14 @@ module DataMapper
       end
 
       def generate(format, context=nil)
-        type, _binding = if context
-          [:generated_model_files, context._get_binding]
-        else
-          [:generated_global_files, binding]
-        end
-
-        puts _binding.eval("self")
-
         generator = Generator[format]
+
+        if context
+          context.instance_eval(&generator.proxy_blk) if generator.proxy_blk
+          type, _binding = :generated_model_files, context._get_binding
+        else
+          type, _binding = :generated_global_files, binding
+        end
 
         generator.send(type).each do |generated_file|
           temp_filename = [
@@ -37,12 +36,12 @@ module DataMapper
           )
 
           if File.exists?(temp_filename)
-            puts "writing file " + result_filename
+            STDOUT.puts "writing file " + result_filename
             template = ERB.new(File.read(temp_filename))
             result = template.result(_binding)
             File.open(result_filename, 'w') { |f| f << result }
           else
-            puts "ERROR: " + temp_filename + " does not exist"
+            STDERR.puts "ERROR: " + temp_filename + " does not exist"
           end
         end
 

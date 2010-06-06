@@ -25,27 +25,12 @@ module DataMapper
 
       class << self
         attr_reader :subclasses,
-                    :generator_name,
                     :generated_model_files,
-                    :generated_global_files
+                    :generated_global_files,
+                    :proxy_blk
 
         def [](generator)
           @subclasses.find {|klass| klass.generator_name == generator}
-        end
-
-        def file_name_prefix(prefix = nil)
-          return @file_name_prefix unless prefix
-          @file_name_prefix = prefix
-        end
-
-        def file_name_suffix(suffix = nil)
-          return @file_name_suffix unless suffix
-          @file_name_suffix = suffix
-        end
-
-        def template(template=nil)
-          return @template unless template
-          @template = template
         end
 
         def generator_name(name=nil)
@@ -53,7 +38,7 @@ module DataMapper
           @generator_name = name
         end
 
-        protected
+        private
 
         def generates_file(&blk)
           @generated_model_files ||= []
@@ -65,7 +50,9 @@ module DataMapper
           @generated_global_files << GeneratedFile.new(&blk)
         end
 
-        private
+        def proxy(&blk)
+          @proxy_blk = blk
+        end
 
         def inherited(klass)
           @subclasses ||= []
@@ -77,7 +64,9 @@ module DataMapper
   end
 end
 
-class DataMapper::MetaMapper::Generator::CPP < DataMapper::MetaMapper::Generator
+class DataMapper::MetaMapper::Proxy; end
+
+class CPPGenerator < DataMapper::MetaMapper::Generator
   generator_name :cpp
 
   generates_global_file{ template_name "dmmm_identifiers.hpp.erb" }
@@ -89,13 +78,25 @@ class DataMapper::MetaMapper::Generator::CPP < DataMapper::MetaMapper::Generator
   generates_global_file{ template_name "dmmm_dbface.h.erb" }
   generates_global_file{ template_name "dmmm_id.hpp.erb" }
 
-  generates_file do |f|
+  proxy do
+    properties.each do |e| 
+      cpp_name = if e.serial?
+        "I_#{e.model.name}"
+      else
+        "O_#{e.model.name}"
+      end
+
+      e.instance_variable_set(:@cpp_name, cpp_name)
+    end
+  end
+
+  generates_file do
     suffix ".hpp"
     prefix "O_"
     template_name "instance.hpp.erb"
   end
 
-  generates_file do |f|
+  generates_file do
     suffix".hpp"
     prefix "T_"
     template_name "class.hpp.erb"
