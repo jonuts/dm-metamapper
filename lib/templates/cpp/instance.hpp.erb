@@ -20,6 +20,7 @@ namespace DMMM {
 
 class O_<%= class_name %>{
 public:
+
     <% generated_properties.each do |property| %>
     const <%= property.instance_variable_get(:@cpp_name) %>::Base& _<%= property.name %>() const { 
         return _f_<%= property.name %>._base; 

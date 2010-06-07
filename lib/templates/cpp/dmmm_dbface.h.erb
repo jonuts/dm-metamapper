@@ -27,6 +27,8 @@ public:
 		const std::string& where,
 		const std::string& additional,		
 		QueryRes& rRes);
+    bool erase(const std::string& table, 
+	       const std::string& where);
     
     std::string now(); 
     

@@ -13,7 +13,7 @@ public:
     
     <% generated_properties.each do |property| %>
     struct E_<%= property.name %>{
-        E_<%= property.name %>() { _field = "<%= property.name %>" ;}
+        E_<%= property.name %>() { _field = "<%= storage_name.to_s + "." + property.name.to_s %>" ;}
         std::string _field;
         typedef T_<%= class_name %>::Condition ConditionType;
         typedef <%= property.instance_variable_get(:@cpp_name) %>::Base ComparerType;
@@ -50,6 +50,16 @@ public:
             <% end %>
         }
     }
+
+    static void erase(const Condition& c)
+    {
+        DBFace::instance()->erase("<%= storage_name %>", c._cond);
+    }
+    static void erase()
+    {
+        DBFace::instance()->erase("<%= storage_name %>", "");
+    }
+
 
     static void select(const Condition& c, 
                        std::vector<O_<%= class_name %>>& r)

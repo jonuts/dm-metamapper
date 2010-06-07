@@ -14,6 +14,9 @@ int main(int argc, char* argv[])
     string password("");
     DBFace dbFace(database, host, user, password);
 
+    T_Dog::erase();
+    T_User::erase();
+
     O_User u;
     u._name() = "omer";
     u._balance() = 5.3;
@@ -31,6 +34,17 @@ int main(int argc, char* argv[])
     d2._name() = "rover";
     d2._stinks() = false;
     d2.insert();
+
+    O_User u2;
+    u2._name() = "jonah";
+    u2.insert();
+
+    O_Dog d3;
+    d3._user_id() = u2._id();
+    d3._name() = "rover";
+    d3._stinks() = false;
+    d3.insert();
+
     
     vector<O_Dog> dogs;
     T_Dog d;
@@ -40,6 +54,8 @@ int main(int argc, char* argv[])
 	dogs[i].update();
 	cout << dogs[i]._name() << " belongs to " << dogs[i].user().first._name() << endl;
     }
+
+    d.erase(d._user_id() == u2._id());
     
 
     return 0;
