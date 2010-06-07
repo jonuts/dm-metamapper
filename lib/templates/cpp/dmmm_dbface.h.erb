@@ -22,12 +22,12 @@ public:
     bool update(const std::string& table, 
 		const std::map<std::string, std::string>& field2Val,
 		const std::string& where);
-    bool select(const std::string& table, 
+    bool select(const std::vector<std::string>& table, 
 		const std::vector<std::string>& columns,
 		const std::string& where,
 		const std::string& additional,		
 		QueryRes& rRes);
-    bool erase(const std::string& table, 
+    bool erase(const std::vector<std::string>& table, 
 	       const std::string& where);
     
     std::string now(); 

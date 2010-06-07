@@ -18,7 +18,7 @@ DBFace::DBFace(const string& database, const string& host,
 }
 
 bool
-DBFace::select(const std::string& table, 
+DBFace::select(const std::vector<std::string>& tables, 
 	       const std::vector<string>& columns,
 	       const std::string& where, 
 	       const std::string& additional, 
@@ -32,9 +32,11 @@ DBFace::select(const std::string& table,
     for (size_t i = 0; i < columns.size(); ++i){
 	if (i > 0)
 	    q << ",";
-	q << columns[i];
+	q << tables[0] << "." << columns[i];
     }
-    q << " FROM " << table;
+    q << " FROM " << tables[0];
+    for (size_t i = 1; i < tables.size(); ++i)
+        q << ", " + tables[i];
     if (where.size())
 	q << " WHERE " << where;
     if (additional.size())
@@ -59,11 +61,15 @@ DBFace::select(const std::string& table,
 
 
 bool 
-DBFace::erase(const std::string& table, 
+DBFace::erase(const std::vector<std::string>& tables, 
    	      const std::string& where)
 {
     Query q = _connection.query();
-    q << "DELETE FROM " << table;
+    q << "DELETE FROM " << tables[0];
+    if (tables.size() > 1)
+        q << " USING " + tables[0] + " ";
+    for (size_t i = 1; i < tables.size(); ++i)
+        q << " INNER JOIN " + tables[i];
     if (where.size())
 	q << " WHERE " << where;
     cout << q << endl;

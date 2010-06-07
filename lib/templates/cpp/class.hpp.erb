@@ -7,25 +7,53 @@ namespace DMMM {
 
 class T_<%= class_name %>{
 public:
+
     struct Condition{
+        bool nil() const { return _cond.size() == 0; }
         std::string _cond;
     };
+
+    T_<%= class_name %>() 
+    {
+        _tables.push_back("<%= storage_name %>");
+    }
+    T_<%= class_name %>(const Condition& c) 
+        : _constraint(c)
+    {
+        _tables.push_back("<%= storage_name %>");
+    }
+    <% self.relationships.select{|r,m| m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'}.each do |r| %> 
+    <% parent = r[0].to_const_string %>
+    T_<%= class_name %>(const T_<%= parent %>& parent)
+    {
+        _tables.push_back("<%= storage_name %>");
+        _tables.insert(_tables.end(), 
+	               parent._tables.begin(), parent._tables.end());
+        
+        _constraint._cond = "(<%= storage_name + "." + r[1].child_key.first.name.to_s %> = " + parent._tables[0] + ".<%= r[1].parent_key.first.name.to_s %>)";
+        if (!parent._constraint.nil())
+	_constraint._cond += " AND " + parent._constraint._cond;
+    } 
+    <% end %>
     
     <% generated_properties.each do |property| %>
     struct E_<%= property.name %>{
-        E_<%= property.name %>() { _field = "<%= storage_name.to_s + "." + property.name.to_s %>" ;}
+        E_<%= property.name %>() 
+        {  
+            _field = "<%= storage_name %>.<%= property.name.to_s %>";
+        }
         std::string _field;
         typedef T_<%= class_name %>::Condition ConditionType;
         typedef <%= property.instance_variable_get(:@cpp_name) %>::Base ComparerType;
     };
 
-    static E_<%= property.name %> _<%= property.name %>(){ 
+    E_<%= property.name %> _<%= property.name %>(){ 
         return E_<%= property.name %>();
     }
 
     <% end %>    
 
-    static void getFields(std::vector<std::string>& rFields)
+    void getFields(std::vector<std::string>& rFields)
     {
         rFields.clear();
         <% generated_properties.each do |property| %>
@@ -33,15 +61,16 @@ public:
         <% end %>
     }
 
-    static void select(const Condition& c, 
-                       const std::string& additional,
-                       std::vector<O_<%= class_name %>>& r)
+    void select(const Condition& c, 
+                const std::string& additional,
+                std::vector<O_<%= class_name %>>& r)
     {
+        Condition c1 = _constraint.nil() ? c : _constraint && c;
         std::vector<std::string> fields;
         getFields(fields);
         QueryRes res;
-        DBFace::instance()->select("<%= storage_name %>",
-                                   fields, c._cond, additional, res);
+        DBFace::instance()->select(_tables, fields, c1._cond, 
+                                   additional, res);
         r.resize(res.size());
         for(size_t i = 0; i < res.size(); ++i){
             <% generated_properties.each do |property| %>
@@ -51,23 +80,31 @@ public:
         }
     }
 
-    static void erase(const Condition& c)
+    void erase(const Condition& c)
     {
-        DBFace::instance()->erase("<%= storage_name %>", c._cond);
+        Condition c1 = _constraint.nil() ? c : _constraint && c;
+        DBFace::instance()->erase(_tables, c1._cond);
     }
-    static void erase()
-    {
-        DBFace::instance()->erase("<%= storage_name %>", "");
-    }
-
-
-    static void select(const Condition& c, 
-                       std::vector<O_<%= class_name %>>& r)
-    {
-        select(c, "", r);
+    void erase()
+    {   
+        DBFace::instance()->erase(_tables, _constraint._cond);
     }
 
-    static std::pair<O_<%= class_name %>, bool> first(const Condition& c){
+
+    void select(const Condition& c, 
+                std::vector<O_<%= class_name %>>& r)
+    {
+        Condition c1 = _constraint.nil() ? c : _constraint && c;
+        select(c1, "", r);
+    }
+    void select(std::vector<O_<%= class_name %>>& r)
+    {
+        select(_constraint, "", r);
+    }
+
+    std::pair<O_<%= class_name %>, bool> first(const Condition& c)
+    {
+        Condition c1 = _constraint.nil() ? c : _constraint && c;
         std::vector<O_<%= class_name %>> r;
         select(c, "limit 1", r);
         if(r.size() > 0)
@@ -76,34 +113,14 @@ public:
             return std::make_pair(O_<%= class_name %>(), false);
     }
 
-    static std::pair<O_<%= class_name %>, bool> first(){
-        return first(Condition());
-    }
-
-};
-
-
-class T_<%= class_name %>_Constrained : public T_<%= class_name %>{
-
-public:
-    void select(const Condition& c, 
-                       const std::string& additional,
-                       std::vector<O_<%= class_name %>>& r)
-    {		      
-        T_<%= class_name %>::select(c && _constraint, additional, r);
-    }
-    std::pair<O_<%= class_name %>, bool> first(const Condition& c){
-        return T_<%= class_name %>::first(c && _constraint);
-    }    
     std::pair<O_<%= class_name %>, bool> first(){
-        return T_<%= class_name %>::first(_constraint);
+        return first(_constraint);
     }
 
-    T_<%= class_name %>_Constrained(const Condition& c) : _constraint(c) {}
 
-private:
-    Condition   _constraint;    
 
+    Condition                 _constraint;    
+    std::vector<std::string>  _tables;
 };
 
 } //namespace DMMM
