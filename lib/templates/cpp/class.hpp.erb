@@ -16,8 +16,13 @@ public:
         E_<%= property.name %>() { _field = "<%= property.name %>" ;}
         std::string _field;
         typedef T_<%= class_name %>::Condition ConditionType;
-        typedef F_<%= property.class.primitive %>::Base ComparerType;
+        typedef <%= property.instance_variable_get(:@cpp_name) %>::Base ComparerType;
     };
+
+    static E_<%= property.name %> _<%= property.name %>(){ 
+        return E_<%= property.name %>();
+    }
+
     <% end %>    
 
     static void getFields(std::vector<std::string>& rFields)
@@ -41,7 +46,7 @@ public:
         for(size_t i = 0; i < res.size(); ++i){
             <% generated_properties.each do |property| %>
             r[i]._f_<%= property.name %>._base = 
-                fromString<F_<%= property.class.primitive %>::Base>(res[i]["<%= property.name %>"]);
+                fromString<<%= property.instance_variable_get(:@cpp_name) %>::Base>(res[i]["<%= property.name %>"]);
             <% end %>
         }
     }

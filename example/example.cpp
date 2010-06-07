@@ -33,7 +33,8 @@ int main(int argc, char* argv[])
     d2.insert();
     
     vector<O_Dog> dogs;
-    T_Dog::select((T_Dog::E_stinks() == false) && (T_Dog::E_name() %= "\%over"), dogs);
+    T_Dog d;
+    d.select((d._stinks() == false) && (d._name() %= "\%over"), dogs);
     for(size_t i = 0; i < dogs.size(); ++i){
 	dogs[i]._name() = string("good_") + dogs[i]._name();
 	dogs[i].update();

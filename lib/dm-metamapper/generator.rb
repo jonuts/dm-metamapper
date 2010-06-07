@@ -79,11 +79,19 @@ class CPPGenerator < DataMapper::MetaMapper::Generator
   generates_global_file{ template_name "dmmm_id.hpp.erb" }
 
   proxy do
+    key_to_parent = {}
+    relationships.select{|r,m| m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'}.each do |r|
+      key_to_parent[r[1].child_key.first.name.to_s] = r[0].to_const_string
+      puts "#{r[1].child_key.first.name.to_s} -> #{r[0].to_const_string}"
+    end
+
     properties.each do |e| 
       cpp_name = if e.serial?
-        "I_#{e.model.name}"
-      else
-        "O_#{e.model.name}"
+        "Field<I_#{e.model.name}>"
+      elsif !key_to_parent[e.name.to_s].nil?
+        "Field<I_#{key_to_parent[e.name.to_s]}>"
+      else           
+        "F_#{e.class.primitive}"
       end
 
       e.instance_variable_set(:@cpp_name, cpp_name)

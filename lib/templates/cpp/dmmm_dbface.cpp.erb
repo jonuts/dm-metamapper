@@ -73,7 +73,7 @@ DBFace::executeQuery(Query& q)
 }
 
 bool
-DBFace::getLastInsertId(Query& rQuery, int& rId)
+DBFace::getLastInsertId(Query& rQuery, size_t& rId)
 {
     try{
         rId = rQuery.insert_id();
@@ -88,7 +88,7 @@ DBFace::getLastInsertId(Query& rQuery, int& rId)
 bool 
 DBFace::insert(const string& table, 
 	       const map<string, string>& field2Val,
-	       int& rInsertId)
+	       size_t& rInsertId)
 {
     if (field2Val.size() == 0)
 	return true;

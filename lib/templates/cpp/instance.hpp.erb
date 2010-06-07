@@ -21,10 +21,10 @@ namespace DMMM {
 class O_<%= class_name %>{
 public:
     <% generated_properties.each do |property| %>
-    const F_<%= property.class.primitive %>::Base& _<%= property.name %>() const { 
+    const <%= property.instance_variable_get(:@cpp_name) %>::Base& _<%= property.name %>() const { 
         return _f_<%= property.name %>._base; 
     }
-    F_<%= property.class.primitive %>::Base& _<%= property.name %>() { 
+    <%= property.instance_variable_get(:@cpp_name) %>::Base& _<%= property.name %>() { 
         _f_<%= property.name %>._dirty = true; 
         return _f_<%= property.name %>._base; 
     }
@@ -56,12 +56,14 @@ public:
                 toString(_f_<%= property.name %>._base);
         <% end %>
         <% if serial %>
-        return DBFace::instance()->insert("<%= storage_name %>", field2Val,
-                                          _f_<%= serial.name %>._base);
+        return DBFace::instance()->
+            insert("<%= storage_name %>", field2Val,
+                   _f_<%= serial.name %>._base.serialization());
 	<% else %>
         size_t id;
-        return DBFace::instance()->insert("<%= storage_name %>", field2Val,
-                                          id);
+        return DBFace::instance()->
+            insert("<%= storage_name %>", field2Val,
+                   id);
         <% end %>
  				   
     }
@@ -85,7 +87,7 @@ public:
 
 private:
     <% generated_properties.each do |property| %>
-    F_<%= property.class.primitive %> _f_<%= property.name %>;
+    <%= property.instance_variable_get(:@cpp_name) %> _f_<%= property.name %>;
     <% end %>
 
 
