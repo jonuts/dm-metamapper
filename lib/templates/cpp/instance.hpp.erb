@@ -68,15 +68,23 @@ public:
                 UTILS::toString(_f_<%= property.name %>._base);
         <% end %>
         <% if serial %>
-        return DBFace::instance()->
-            insert("<%= storage_name %>", field2Val,
-                   _f_<%= serial.name %>._base.serialization());
+        if (DBFace::instance()->
+                insert("<%= storage_name %>", field2Val,
+                       _f_<%= serial.name %>._base.serialization()))
 	<% else %>
         size_t id;
-        return DBFace::instance()->
-            insert("<%= storage_name %>", field2Val,
-                   id);
+        if (DBFace::instance()->
+                insert("<%= storage_name %>", field2Val,
+                       id))
         <% end %>
+        {
+            <% generated_properties.each do |property| %>
+            _f_<%= property.name %>._dirty = false;
+            <% end %>
+            return true;
+        }
+ 	else
+	    return false;
  				   
     }
 
