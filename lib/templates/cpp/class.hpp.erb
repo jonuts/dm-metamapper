@@ -103,6 +103,10 @@ public:
         select(_constraint, "", r);
     }
 
+    std::pair<O_<%= class_name %>, bool> select(const I_<%= class_name %>& id){
+        return first(E_<%= serial.name %>() == id);
+    }
+
     std::pair<O_<%= class_name %>, bool> first(const Condition& c)
     {
         Condition c1 = _constraint.nil() ? c : _constraint && c;
@@ -117,6 +121,8 @@ public:
     std::pair<O_<%= class_name %>, bool> first(){
         return first(_constraint);
     }
+
+
 
 
 

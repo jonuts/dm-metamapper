@@ -32,6 +32,8 @@ int main(int argc, char* argv[])
     d1._stinks() = true;
     d1.insert();
 
+    d1 = d.select(d1._id()).first;
+
     O_Dog d2(u1);
     d2._name() = "rover";
     d2._stinks() = false;
