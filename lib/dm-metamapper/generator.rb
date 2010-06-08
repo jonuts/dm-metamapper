@@ -91,7 +91,7 @@ class CPPGenerator < DataMapper::MetaMapper::Generator
       elsif !key_to_parent[e.name.to_s].nil?
         "Field<I_#{key_to_parent[e.name.to_s]}>"
       else           
-        "F_#{e.class.primitive}"
+        "F_#{e.primitive}"
       end
 
       e.instance_variable_set(:@cpp_name, cpp_name)
