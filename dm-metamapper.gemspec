@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{dm-metamapper}
-  s.version = "0.0.2"
+  s.version = "0.0.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jonah Honeyman", "Omer Tamuz"]
-  s.date = %q{2010-06-08}
+  s.date = %q{2010-06-09}
   s.description = %q{C++ API for databases created with DM. Hard typing, compile time checked queries.}
   s.email = %q{jonah@honeyman.org}
   s.extra_rdoc_files = [
