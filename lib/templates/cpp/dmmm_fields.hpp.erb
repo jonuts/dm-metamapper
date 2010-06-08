@@ -12,6 +12,7 @@ namespace DMMM {
 template<class T>
 struct Field{
     Field<T>() :_dirty(false) {}
+    Field<T>(const T& t) :_dirty(true), _base(t) {}
     typedef T Base;
     bool _dirty;
     T _base;

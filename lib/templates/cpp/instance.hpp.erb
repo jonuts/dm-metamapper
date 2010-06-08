@@ -21,6 +21,14 @@ namespace DMMM {
 class O_<%= class_name %>{
 public:
 
+    O_<%= class_name %>() {}
+    <% self.relationships.select{|r,m| m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'}.each do |r| %> 
+    <% parent = r[0].to_const_string %>
+    O_<%= class_name %>(const O_<%= parent %>& parent) 
+        : _f_<%= r[1].child_key.first.name.to_s %>(parent._<%= r[1].parent_key.first.name.to_s %>())
+        {}
+    <% end %>
+
     <% generated_properties.each do |property| %>
     const <%= property.instance_variable_get(:@cpp_name) %>::Base& _<%= property.name %>() const { 
         return _f_<%= property.name %>._base; 

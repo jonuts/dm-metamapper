@@ -2,6 +2,7 @@
 #include "dmmm_dbface.h"
 #include "T_User.hpp"
 #include "T_Dog.hpp"
+#include "T_LittleFlea.hpp"
 
 using namespace std;
 using namespace DMMM;
@@ -31,8 +32,7 @@ int main(int argc, char* argv[])
     d1._stinks() = true;
     d1.insert();
 
-    O_Dog d2;
-    d2._user_id() = u1._id();
+    O_Dog d2(u1);
     d2._name() = "rover";
     d2._stinks() = false;
     d2.insert();
@@ -47,6 +47,8 @@ int main(int argc, char* argv[])
     d3._stinks() = false;
     d3.insert();
 
+    O_LittleFlea f1(d3);
+    f1.insert();
     
     vector<O_Dog> dogs;
     d.select((d._stinks() == false) && (d._name() %= "\%over"), dogs);
