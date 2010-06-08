@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{dm-metamapper}
-  s.version = "0.0.0"
+  s.version = "0.0.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jonah Honeyman", "Omer Tamuz"]
@@ -19,7 +19,9 @@ Gem::Specification.new do |s|
     ".gitignore",
      "Gemfile",
      "README.md",
+     "Rakefile",
      "VERSION",
+     "dm-metamapper.gemspec",
      "example/.gitignore",
      "example/Makefile",
      "example/example.cpp",
