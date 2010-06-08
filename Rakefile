@@ -13,3 +13,10 @@ begin
 rescue LoadError
   puts "Jeweler not available. Install it with: gem install jeweler"
 end
+
+desc "local gem build and install"
+task :local do
+  sh "gem build dm-metamapper.gemspec"
+  version = File.read("VERSION").chomp
+  sh "gem install -l ./dm-metamapper-#{version}.gem"
+end

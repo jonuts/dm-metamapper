@@ -79,6 +79,7 @@ class CPPGenerator < DataMapper::MetaMapper::Generator
   generates_global_file{ template_name "dmmm_id.hpp.erb" }
 
   proxy do
+    puts "Generating files for model " + self.name.to_s
     key_to_parent = {}
     relationships.select{|r,m| m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'}.each do |r|
       key_to_parent[r[1].child_key.first.name.to_s] = r[0].to_const_string

@@ -4,7 +4,8 @@ module DataMapper
       attr_reader :models
 
       def register(klass)
-        (@models ||= []) << klass
+        @models ||= []
+        @models << klass unless models.member?(klass)
       end
 
       def generate(format, context=nil)
