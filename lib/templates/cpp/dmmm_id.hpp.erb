@@ -6,6 +6,8 @@
 #include <sstream>
 
 namespace DMMM{
+namespace UTILS{
+
 template<class T>
 class Id {
 
@@ -57,11 +59,12 @@ private:
 };
 
 
+} //namespace UTILS
 } //namespace DMMM
 
 template<class T>
 std::ostream& 
-operator<< (std::ostream& os, const DMMM::Id<T>& id)
+operator<< (std::ostream& os, const DMMM::UTILS::Id<T>& id)
 { 
     os << id.to_s(); 
     return os;
@@ -69,7 +72,7 @@ operator<< (std::ostream& os, const DMMM::Id<T>& id)
 
 template<class T>
 std::istream& 
-operator>> (std::istream& is, DMMM::Id<T>& id)
+operator>> (std::istream& is, DMMM::UTILS::Id<T>& id)
 { 
     is >> id.serialization(); 
     return is;

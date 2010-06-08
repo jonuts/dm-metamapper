@@ -26,7 +26,7 @@ module DataMapper
             generated_file.template
           ].join('/')
 
-          result_base_name = context ? context.name.to_s : generated_file.template.sub(/\.erb$/,'')
+          result_base_name = context ? context.name.to_s.sub(/::/,'_') : generated_file.template.sub(/\.erb$/,'')
 
           result_filename = File.join(
             File.dirname(__FILE__), "../../output", [

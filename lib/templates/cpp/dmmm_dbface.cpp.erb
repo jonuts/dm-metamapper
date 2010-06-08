@@ -54,7 +54,7 @@ DBFace::select(const std::vector<std::string>& tables,
     for (size_t i = 0; i < mysqlRes.num_rows(); ++i){
 	rRes.resize(rRes.size() + 1);
 	for (size_t j = 0; j < columns.size(); ++j)
-	    rRes.back()[columns[j]] = toString(mysqlRes[i][columns[j].c_str()]);
+	    rRes.back()[columns[j]] = UTILS::toString(mysqlRes[i][columns[j].c_str()]);
     }
     return true;
 }
@@ -172,5 +172,5 @@ DBFace::now()
         cerr << "Query failed: " << q << endl << er.what();
         return string();
     }
-    return toString(mysqlRes[0]["now()"]);
+    return UTILS::toString(mysqlRes[0]["now()"]);
 }

@@ -82,13 +82,13 @@ class CPPGenerator < DataMapper::MetaMapper::Generator
     puts "Generating files for model " + self.name.to_s
     key_to_parent = {}
     relationships.select{|r,m| m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'}.each do |r|
-      key_to_parent[r[1].child_key.first.name.to_s] = r[0].to_const_string
-      puts "#{r[1].child_key.first.name.to_s} -> #{r[0].to_const_string}"
+      key_to_parent[r[1].child_key.first.name.to_s] = r[1].parent_model_name.to_const_string.sub(/::/,'_')
+      puts "#{r[1].child_key.first.name.to_s} -> #{key_to_parent[r[1].child_key.first.name.to_s]}"
     end
 
     properties.each do |e| 
       cpp_name = if e.serial?
-        "Field<I_#{e.model.name}>"
+        "Field<I_#{e.model.name.sub(/::/,'_')}>"
       elsif !key_to_parent[e.name.to_s].nil?
         "Field<I_#{key_to_parent[e.name.to_s]}>"
       else           

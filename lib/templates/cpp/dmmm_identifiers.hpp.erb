@@ -6,8 +6,9 @@
 namespace DMMM {
 
 <% models.each do |model| %>
-class DummyO_<%= model.name %>;
-typedef Id<DummyO_<%= model.name %>> I_<%= model.name %>;
+<% model_name = model.name.sub(/::/,'_') %>
+class DummyO_<%= model_name %>;
+typedef UTILS::Id<DummyO_<%= model_name %>> I_<%= model_name %>;
 <% end %>
 
 

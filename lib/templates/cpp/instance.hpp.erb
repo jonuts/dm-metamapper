@@ -1,4 +1,4 @@
-<% class_name = self.name %>
+<% class_name = self.name.sub(/::/,'_') %>
 <% all_caps_name = class_name.upcase %>
 #ifndef O_<%= all_caps_name %>
 #define O_<%= all_caps_name %>
@@ -11,7 +11,7 @@
 #include "dmmm_fields.hpp"
 #include "dmmm_comparators.hpp"
 <% self.relationships.select{|r,m| m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'}.each do |relative| %>
-#include "T_<%= relative[1].parent_model.to_s %>.hpp"
+#include "T_<%= relative[1].parent_model.to_s.sub(/::/,'_') %>.hpp"
 <% end %>
 
 <%# self.relationships.select{|r,m| m.class.name == 'DataMapper::Associations::OneToMany::Relationship'}.each do |relative| %>
@@ -23,7 +23,7 @@ public:
 
     O_<%= class_name %>() {}
     <% self.relationships.select{|r,m| m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'}.each do |r| %> 
-    <% parent = r[0].to_const_string %>
+    <% parent = r[1].parent_model_name.sub(/::/,'_') %>
     O_<%= class_name %>(const O_<%= parent %>& parent) 
         : _f_<%= r[1].child_key.first.name.to_s %>(parent._<%= r[1].parent_key.first.name.to_s %>())
         {}
@@ -49,10 +49,10 @@ public:
         <% generated_properties.each do |property| %>
         if (_f_<%= property.name %>._dirty)
             field2Val["<%= property.name %>"] = 
-                toString(_f_<%= property.name %>._base);
+                UTILS::toString(_f_<%= property.name %>._base);
         <% end %>
         std::string where =
-	    "<%= serial.name %>=" + toString(_f_<%= serial.name %>._base);
+	    "<%= serial.name %>=" + UTILS::toString(_f_<%= serial.name %>._base);
         return DBFace::instance()->update("<%= storage_name %>", 
                                           field2Val, where);
     }
@@ -65,7 +65,7 @@ public:
         <% generated_properties.each do |property| %>
         if (_f_<%= property.name %>._dirty)
             field2Val["<%= property.name %>"] = 
-                toString(_f_<%= property.name %>._base);
+                UTILS::toString(_f_<%= property.name %>._base);
         <% end %>
         <% if serial %>
         return DBFace::instance()->
@@ -81,7 +81,7 @@ public:
     }
 
     <% self.relationships.select{|r,m| m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'}.each do |r| %> 
-    <% parent = r[0].to_const_string %>
+    <% parent = r[1].parent_model_name.sub(/::/,'_') %>
     std::pair<O_<%= parent %>, bool> <%= r[0] %>(){
         T_<%= parent %> T(T_<%= parent %>::E_<%= r[1].parent_key.first.name.to_s %>() == _<%= r[1].child_key.first.name.to_s %>());
 	return T.first();

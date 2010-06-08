@@ -1,4 +1,4 @@
-<% class_name = self.name %>
+<% class_name = self.name.sub(/::/,'_') %>
 <% all_caps_name = class_name.upcase %>
 #ifndef T_<%= all_caps_name %>
 #define T_<%= all_caps_name %>
@@ -23,7 +23,7 @@ public:
         _tables.push_back("<%= storage_name %>");
     }
     <% self.relationships.select{|r,m| m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'}.each do |r| %> 
-    <% parent = r[0].to_const_string %>
+    <% parent = r[1].parent_model_name.sub(/::/,'_') %>
     T_<%= class_name %>(const T_<%= parent %>& parent)
     {
         _tables.push_back("<%= storage_name %>");
@@ -76,7 +76,7 @@ public:
         for(size_t i = 0; i < res.size(); ++i){
             <% generated_properties.each do |property| %>
             r[i]._f_<%= property.name %>._base = 
-                fromString<<%= property.instance_variable_get(:@cpp_name) %>::Base>(res[i]["<%= property.name %>"]);
+                UTILS::fromString<<%= property.instance_variable_get(:@cpp_name) %>::Base>(res[i]["<%= property.name %>"]);
             <% end %>
         }
     }

@@ -8,49 +8,49 @@ namespace DMMM {
 template<class E>
 typename E::ConditionType operator== (E e, const typename E::ComparerType& x){
     typename E::ConditionType c;
-    c._cond = e._field + " = '" + toString(x) + "'";
+    c._cond = e._field + " = '" + UTILS::toString(x) + "'";
     return c;
 }
 
 template<class E>
 typename E::ConditionType operator< (E e, const typename E::ComparerType& x){
     typename E::ConditionType c;
-    c._cond = e._field + " < '" + toString(x) + "'";
+    c._cond = e._field + " < '" + UTILS::toString(x) + "'";
     return c;
 }
 
 template<class E>
 typename E::ConditionType operator<= (E e, const typename E::ComparerType& x){
     typename E::ConditionType c;
-    c._cond = e._field + " <= '" + toString(x) + "'";
+    c._cond = e._field + " <= '" + UTILS::toString(x) + "'";
     return c;
 }
 
 template<class E>
 typename E::ConditionType operator> (E e, const typename E::ComparerType& x){
     typename E::ConditionType c;
-    c._cond = e._field + " > '" + toString(x) + "'";
+    c._cond = e._field + " > '" + UTILS::toString(x) + "'";
     return c;
 }
 
 template<class E>
 typename E::ConditionType operator>= (E e, const typename E::ComparerType& x){
     typename E::ConditionType c;
-    c._cond = e._field + " >= '" + toString(x) + "'";
+    c._cond = e._field + " >= '" + UTILS::toString(x) + "'";
     return c;
 }
 
 template<class E>
 typename E::ConditionType operator!= (E e, const typename E::ComparerType& x){
     typename E::ConditionType c;
-    c._cond = e._field + " != '" + toString(x) + "'";
+    c._cond = e._field + " != '" + UTILS::toString(x) + "'";
     return c;
 }
 
 template<class E>
 typename E::ConditionType operator%= (E e, const typename E::ComparerType& x){
     typename E::ConditionType c;
-    c._cond = e._field + " LIKE '" + toString(x) + "'";
+    c._cond = e._field + " LIKE '" + UTILS::toString(x) + "'";
     return c;
 }
 
