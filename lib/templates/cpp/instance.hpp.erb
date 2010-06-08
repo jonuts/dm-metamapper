@@ -27,6 +27,9 @@ public:
     O_<%= class_name %>(const O_<%= parent %>& parent) 
         : _f_<%= r[1].child_key.first.name.to_s %>(parent._<%= r[1].parent_key.first.name.to_s %>())
         {}
+    O_<%= class_name %>(const I_<%= parent %>& parent_id) 
+        : _f_<%= r[1].child_key.first.name.to_s %>(parent_id)
+        {}
     <% end %>
 
     <% generated_properties.each do |property| %>

@@ -41,8 +41,7 @@ int main(int argc, char* argv[])
     u2._name() = "jonah";
     u2.insert();
 
-    O_Dog d3;
-    d3._user_id() = u2._id();
+    O_Dog d3(u2._id());
     d3._name() = "rover";
     d3._stinks() = false;
     d3.insert();
