@@ -62,8 +62,7 @@ int main(int argc, char* argv[])
     }
 
 
-    T_User uconst(u._name() == "omer");
-    T_Dog dconst(uconst);
+    T_Dog dconst(T_User(u._name() == "omer"));
     dogs.clear();
     dconst.select(d._stinks() == true, dogs);
     cout << dogs.size() << " dogs meet criterion" << endl;
