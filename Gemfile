@@ -9,4 +9,8 @@ group :test do
   gem "dm-migrations", :git => "git://github.com/datamapper/dm-migrations"
 end
 
+group :deploy do
+  gem "jeweler"
+end
+
 # vim: set ft=ruby:
