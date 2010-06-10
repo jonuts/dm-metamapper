@@ -2,6 +2,10 @@ module DataMapper
   module MetaMapper
     module Generators
       class CPP < DataMapper::MetaMapper::Generator
+        config[:template_dir] = File.expand_path(
+          File.join(File.dirname(__FILE__), '../../templates/cpp')
+        )
+
         generates_file :global, "dmmm_identifiers.hpp"
         generates_file :global, "dmmm_comparators.hpp"
         generates_file :global, "dmmm_fields.hpp"
@@ -15,8 +19,7 @@ module DataMapper
         generates_file :model, "T_class.hpp", :template => "class.hpp.erb"
 
         setup_model do |model|
-          key_to_parent = model.relationships.inject({}) do |hash, (r,m)|
-            next unless m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'
+          key_to_parent = many_to_one.inject({}) do |hash, (r,m)|
             hash[m.child_key.first.name] = decolonize(m.parent_model_name.to_const_string)
             hash
           end
@@ -38,6 +41,13 @@ module DataMapper
 
         def decolonize(str)
           str.sub(/::/,'_')
+        end
+
+        def many_to_one
+          return unless model
+          @many_to_one ||= model.relationships.select {|r,m|
+            m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'
+          }
         end
       end
     end

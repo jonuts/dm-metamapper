@@ -2,7 +2,6 @@ module DataMapper
   module MetaMapper
     class Generator
       @subclasses = []
-      @config = Config.new
 
       class << self
         attr_reader :subclasses,
@@ -27,7 +26,7 @@ module DataMapper
         private
 
         def generates_file(type, name, opts={})
-          opts.merge! :type => type
+          opts.merge! :type => type, :generator => self
 
           @generated_files ||= TemplateCollection.new
           @generated_files << Template.new(name, opts)
@@ -42,12 +41,13 @@ module DataMapper
           @subclasses << klass
           klass.instance_variable_set(:@generator_name, klass.name.snake_case)
           klass.instance_variable_set(:@setup_model_blk, lambda{|lolwut|})
+          klass.instance_variable_set(:@config, Config.new)
         end
       end
 
       # model can be nil or DataMapper::Model
       def initialize(model)
-        yield model
+        yield model if model
 
         @model = model
         @templates = if model
@@ -60,7 +60,7 @@ module DataMapper
       attr_reader :model
 
       def run
-        @templates.each { generate template }
+        @templates.each {|template| generate template }
       end
 
       private
