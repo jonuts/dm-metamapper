@@ -4,7 +4,7 @@ require "bundler"
 Bundler.setup(:default, :test)
 require "dm-core"
 require "lib/dm-metamapper.rb"
-DataMapper::MetaMapper.use :output_dir => File.expand_path(File.join(File.dirname(__FILE__), '../output'))
+DataMapper::MetaMapper.use :output_dir => File.expand_path('../../output', __FILE__)
 require "dm-metamapper/generators/cpp"
 
 #DataMapper.setup(:default, "sqlite3::memory:")

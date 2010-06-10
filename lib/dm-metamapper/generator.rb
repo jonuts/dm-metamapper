@@ -78,7 +78,7 @@ module DataMapper
         end
 
         compiled = ERB.new(File.read(template.full_path)).result(binding)
-        File.open(template.output_path, 'w') {|f| f << compiled}
+        File.open(template.output_path(model), 'w') {|f| f << compiled}
       end
     end
 

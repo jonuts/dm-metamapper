@@ -1,4 +1,4 @@
-<% class_name = self.name.sub(/::/,'_') %>
+<% class_name = decolonize(model.name) %>
 <% all_caps_name = class_name.upcase %>
 #ifndef O_<%= all_caps_name %>
 #define O_<%= all_caps_name %>
@@ -10,8 +10,8 @@
 #include "dmmm_identifiers.hpp"
 #include "dmmm_fields.hpp"
 #include "dmmm_comparators.hpp"
-<% self.relationships.select{|r,m| m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'}.each do |relative| %>
-#include "T_<%= relative[1].parent_model.to_s.sub(/::/,'_') %>.hpp"
+<% many_to_one.each do |relative| %>
+#include "T_<%= decolonize(relative[1].parent_model.to_s) %>.hpp"
 <% end %>
 
 <%# self.relationships.select{|r,m| m.class.name == 'DataMapper::Associations::OneToMany::Relationship'}.each do |relative| %>
@@ -22,8 +22,8 @@ class O_<%= class_name %>{
 public:
 
     O_<%= class_name %>() {}
-    <% self.relationships.select{|r,m| m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'}.each do |r| %> 
-    <% parent = r[1].parent_model_name.sub(/::/,'_') %>
+    <% many_to_one.each do |r| %> 
+    <% parent = decolonize(r[1].parent_model_name) %>
     O_<%= class_name %>(const O_<%= parent %>& parent) 
         : _f_<%= r[1].child_key.first.name.to_s %>(parent._<%= r[1].parent_key.first.name.to_s %>())
         {}
@@ -32,7 +32,7 @@ public:
         {}
     <% end %>
 
-    <% generated_properties.each do |property| %>
+    <% model.generated_properties.each do |property| %>
     const <%= property.instance_variable_get(:@cpp_name) %>::Base& _<%= property.name %>() const { 
         return _f_<%= property.name %>._base; 
     }
@@ -40,45 +40,42 @@ public:
         _f_<%= property.name %>._dirty = true; 
         return _f_<%= property.name %>._base; 
     }
-
     <% end %>
 
-    <% if serial %>
+    <% if model.serial %>
     bool update(){
         std::map<std::string, std::string> field2Val;
-        <% generated_properties.each do |property| %>
+        <% model.generated_properties.each do |property| %>
         if (_f_<%= property.name %>._dirty)
             field2Val["<%= property.name %>"] = 
                 UTILS::toString(_f_<%= property.name %>._base);
         <% end %>
         std::string where =
-	    "<%= serial.name %>=" + UTILS::toString(_f_<%= serial.name %>._base);
-        return DBFace::instance()->update("<%= storage_name %>", 
+	    "<%= model.serial.name %>=" + UTILS::toString(_f_<%= model.serial.name %>._base);
+        return DBFace::instance()->update("<%= model.storage_name %>", 
                                           field2Val, where);
     }
-
     <% end %>
-
 
     bool insert(){
         std::map<std::string, std::string> field2Val;
-        <% generated_properties.each do |property| %>
+        <% model.generated_properties.each do |property| %>
         if (_f_<%= property.name %>._dirty)
             field2Val["<%= property.name %>"] = 
                 UTILS::toString(_f_<%= property.name %>._base);
         <% end %>
-        <% if serial %>
+        <% if model.serial %>
         if (DBFace::instance()->
-                insert("<%= storage_name %>", field2Val,
-                       _f_<%= serial.name %>._base.serialization()))
+                insert("<%= model.storage_name %>", field2Val,
+                       _f_<%= model.serial.name %>._base.serialization()))
 	<% else %>
         size_t id;
         if (DBFace::instance()->
-                insert("<%= storage_name %>", field2Val,
+                insert("<%= model.storage_name %>", field2Val,
                        id))
         <% end %>
         {
-            <% generated_properties.each do |property| %>
+            <% model.generated_properties.each do |property| %>
             _f_<%= property.name %>._dirty = false;
             <% end %>
             return true;
@@ -88,20 +85,18 @@ public:
  				   
     }
 
-    <% self.relationships.select{|r,m| m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'}.each do |r| %> 
-    <% parent = r[1].parent_model_name.sub(/::/,'_') %>
+    <% many_to_one.each do |r| %> 
+    <% parent = decolonize(r[1].parent_model_name) %>
     std::pair<O_<%= parent %>, bool> <%= r[0] %>(){
         T_<%= parent %> T(T_<%= parent %>::E_<%= r[1].parent_key.first.name.to_s %>() == _<%= r[1].child_key.first.name.to_s %>());
 	return T.first();
     }
     <% end %>
 
-
 private:
-    <% generated_properties.each do |property| %>
+    <% model.generated_properties.each do |property| %>
     <%= property.instance_variable_get(:@cpp_name) %> _f_<%= property.name %>;
     <% end %>
-
 
     friend class T_<%= class_name %>;
 };

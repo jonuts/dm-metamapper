@@ -2,7 +2,7 @@ module DataMapper
   module MetaMapper
     module Generators
       class CPP < DataMapper::MetaMapper::Generator
-        config[:template_dir] = File.expand_path('../../templates/cpp', __FILE__)
+        config[:template_dir] = File.expand_path('../../../templates/cpp', __FILE__)
 
         generates_file :global, "dmmm_identifiers.hpp"
         generates_file :global, "dmmm_comparators.hpp"
@@ -13,8 +13,8 @@ module DataMapper
         generates_file :global, "dmmm_dbface.h"
         generates_file :global, "dmmm_id.hpp"
 
-        generates_file :model, "O_instance.hpp", :template => "instance.hpp"
-        generates_file :model, "T_class.hpp", :template => "class.hpp"
+        generates_file :model, "O_%model%.hpp", :template => "instance.hpp"
+        generates_file :model, "T_%model%.hpp", :template => "class.hpp"
 
         setup_model do
           key_to_parent = many_to_one.inject({}) do |hash, (r,m)|
