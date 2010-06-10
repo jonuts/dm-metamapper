@@ -23,8 +23,8 @@ module DataMapper
       attr_reader :name, :type
 
       def output_path(model)
-        @name.sub!("%model%", model.name.snake_case) if model
-        File.join(@generator.config.output_dir, @name)
+        name = model ? @name.sub("%model%", model.name.snake_case) : @name
+        File.join(@generator.config.output_dir, name)
       end
 
       def full_path

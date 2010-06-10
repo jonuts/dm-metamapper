@@ -1,4 +1,4 @@
-<% class_name = self.name.sub(/::/,'_') %>
+<% class_name = decolonize(model.name) %>
 <% all_caps_name = class_name.upcase %>
 #ifndef T_<%= all_caps_name %>
 #define T_<%= all_caps_name %>
@@ -15,33 +15,32 @@ public:
 
     T_<%= class_name %>() 
     {
-        _tables.push_back("<%= storage_name %>");
+        _tables.push_back("<%= model.storage_name %>");
     }
     T_<%= class_name %>(const Condition& c) 
         : _constraint(c)
     {
-        _tables.push_back("<%= storage_name %>");
+        _tables.push_back("<%= model.storage_name %>");
     }
-    <% self.relationships.select{|r,m| m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'}.each do |r| %> 
-    <% parent = r[1].parent_model_name.sub(/::/,'_') %>
+    <% many_to_one.each do |r| %> 
+    <% parent = decolonize(r[1].parent_model_name) %>
     T_<%= class_name %>(const T_<%= parent %>& parent)
     {
-        _tables.push_back("<%= storage_name %>");
+        _tables.push_back("<%= model.storage_name %>");
         _tables.insert(_tables.end(), 
 	               parent._tables.begin(), parent._tables.end());
         
-        _constraint._cond = "(<%= storage_name + "." + r[1].child_key.first.name.to_s %> = " + parent._tables[0] + ".<%= r[1].parent_key.first.name.to_s %>)";
+        _constraint._cond = "(<%= model.storage_name + "." + r[1].child_key.first.name.to_s %> = " + parent._tables[0] + ".<%= r[1].parent_key.first.name.to_s %>)";
         if (!parent._constraint.nil())
 	_constraint._cond += " AND " + parent._constraint._cond;
     } 
-
     <% end %>
     
-    <% generated_properties.each do |property| %>
+    <% model.generated_properties.each do |property| %>
     struct E_<%= property.name %>{
         E_<%= property.name %>() 
         {  
-            _field = "<%= storage_name %>.<%= property.name.to_s %>";
+            _field = "<%= model.storage_name %>.<%= property.name.to_s %>";
         }
         std::string _field;
         typedef T_<%= class_name %>::Condition ConditionType;
@@ -51,13 +50,12 @@ public:
     E_<%= property.name %> _<%= property.name %>(){ 
         return E_<%= property.name %>();
     }
-
     <% end %>    
 
     void getFields(std::vector<std::string>& rFields)
     {
         rFields.clear();
-        <% generated_properties.each do |property| %>
+        <% model.generated_properties.each do |property| %>
         rFields.push_back("<%= property.name %>");
         <% end %>
     }
@@ -74,7 +72,7 @@ public:
                                    additional, res);
         r.resize(res.size());
         for(size_t i = 0; i < res.size(); ++i){
-            <% generated_properties.each do |property| %>
+            <% model.generated_properties.each do |property| %>
             r[i]._f_<%= property.name %>._base = 
                 UTILS::fromString<<%= property.instance_variable_get(:@cpp_name) %>::Base>(res[i]["<%= property.name %>"]);
             <% end %>
@@ -104,7 +102,7 @@ public:
     }
 
     std::pair<O_<%= class_name %>, bool> select(const I_<%= class_name %>& id){
-        return first(E_<%= serial.name %>() == id);
+        return first(E_<%= model.serial.name %>() == id);
     }
 
     std::pair<O_<%= class_name %>, bool> first(const Condition& c)
