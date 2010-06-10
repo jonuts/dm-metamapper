@@ -1,33 +1,14 @@
 module DataMapper
   module MetaMapper
     class Generator
-      class GeneratedFile
-        def initialize(&blk)
-          instance_eval(&blk) if block_given?
-        end
-
-        attr_reader :template, :file_name_prefix, :file_name_suffix
-
-        def template_name(template)
-          @template = template
-        end
-
-        def prefix(str)
-          @file_name_prefix = str
-        end
-
-        def suffix(str)
-          @file_name_suffix = str
-        end
-      end
-
       @subclasses = []
+      @config = Config.new
 
       class << self
         attr_reader :subclasses,
-                    :generated_model_files,
-                    :generated_global_files,
-                    :proxy_blk
+                    :generated_files,
+                    :proxy_blk,
+                    :config
 
         def [](generator)
           @subclasses.find {|klass| klass.generator_name == generator}
@@ -38,77 +19,62 @@ module DataMapper
           @generator_name = name
         end
 
+        def run(model)
+          @model = model
+          new(model, &@setup_model_blk).run
+        end
+
         private
 
-        def generates_file(&blk)
-          @generated_model_files ||= []
-          @generated_model_files << GeneratedFile.new(&blk)
+        def generates_file(type, name, opts={})
+          opts.merge! :type => type
+
+          @generated_files ||= TemplateCollection.new
+          @generated_files << Template.new(name, opts)
         end
 
-        def generates_global_file(&blk)
-          @generated_global_files ||= []
-          @generated_global_files << GeneratedFile.new(&blk)
-        end
-
-        def proxy(&blk)
-          @proxy_blk = blk
+        def setup_model(&blk)
+          @setup_model_blk = blk
         end
 
         def inherited(klass)
           @subclasses ||= []
           @subclasses << klass
-          klass.instance_variable_set(:@generator_name, @generator_name)
+          klass.instance_variable_set(:@generator_name, klass.name.snake_case)
+          klass.instance_variable_set(:@setup_model_blk, lambda{|lolwut|})
         end
       end
-    end
-  end
-end
 
-class DataMapper::MetaMapper::Proxy; end
+      # model can be nil or DataMapper::Model
+      def initialize(model)
+        yield model
 
-class CPPGenerator < DataMapper::MetaMapper::Generator
-  generator_name :cpp
-
-  generates_global_file{ template_name "dmmm_identifiers.hpp.erb" }
-  generates_global_file{ template_name "dmmm_comparators.hpp.erb" }
-  generates_global_file{ template_name "dmmm_fields.hpp.erb" }
-  generates_global_file{ template_name "dmmm_utils.hpp.erb" }
-  generates_global_file{ template_name "dmmm_utils.cpp.erb" }
-  generates_global_file{ template_name "dmmm_dbface.cpp.erb" }
-  generates_global_file{ template_name "dmmm_dbface.h.erb" }
-  generates_global_file{ template_name "dmmm_id.hpp.erb" }
-
-  proxy do
-    puts "Generating files for model " + self.name.to_s
-    key_to_parent = {}
-    relationships.select{|r,m| m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'}.each do |r|
-      key_to_parent[r[1].child_key.first.name.to_s] = r[1].parent_model_name.to_const_string.sub(/::/,'_')
-      puts "#{r[1].child_key.first.name.to_s} -> #{key_to_parent[r[1].child_key.first.name.to_s]}"
-    end
-
-    properties.each do |e| 
-      cpp_name = if e.serial?
-        "Field<I_#{e.model.name.sub(/::/,'_')}>"
-      elsif !key_to_parent[e.name.to_s].nil?
-        "Field<I_#{key_to_parent[e.name.to_s]}>"
-      else           
-        "F_#{e.primitive}"
+        @model = model
+        @templates = if model
+          self.class.generated_files.models
+        else
+          self.class.generated_files.global
+        end
       end
 
-      e.instance_variable_set(:@cpp_name, cpp_name)
+      attr_reader :model
+
+      def run
+        @templates.each { generate template }
+      end
+
+      private
+
+      def generate(template)
+        if !File.exists? template.full_path
+          raise NoTemplateError, "Template does not exist at path #{template.full_path}"
+        end
+
+        compiled = ERB.new(File.read(template.full_path)).result
+        File.open(template.output_path, 'w') {|f| f << compiled}
+      end
     end
-  end
 
-  generates_file do
-    suffix ".hpp"
-    prefix "O_"
-    template_name "instance.hpp.erb"
-  end
-
-  generates_file do
-    suffix".hpp"
-    prefix "T_"
-    template_name "class.hpp.erb"
   end
 end
 

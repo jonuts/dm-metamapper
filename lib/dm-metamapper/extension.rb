@@ -1,12 +1,14 @@
 module DataMapper
   module MetaMapper
     module Extension
-      def generates(*layouts)
-        @_generation_formats = Array(layouts)
+      def doesnt_generate(*layouts)
+        @_skipped_generation_formats = Array(layouts)
       end
+      alias_method :dont_generate, :doesnt_generate
+      alias_method :skip_generation, :doesnt_generate
 
       def generates?(format)
-        @_generation_formats.include?(format)
+        !@_skipped_generation_formats.include?(format)
       end
 
       def generate(format)
@@ -19,16 +21,11 @@ module DataMapper
         }
       end
 
-      def _get_binding
-        binding
-      end
-
       def self.extended(base)
         DataMapper::MetaMapper.register(base)
-        base.instance_variable_set(:@_generation_formats, [])
-        class <<base; attr_reader :_generation_formats end
+        base.instance_variable_set(:@_skipped_generation_formats, [])
+        class <<base; attr_reader :_skipped_generation_formats end
       end
-
     end
   end
 end

@@ -12,8 +12,6 @@ class User
   include DataMapper::Resource
   extend DataMapper::MetaMapper::Extension
 
-  generates :cpp
-
   has n,    :dogs
 
   property :id,           Serial
@@ -25,8 +23,6 @@ end
 class Dog
   include DataMapper::Resource
   extend DataMapper::MetaMapper::Extension
-
-  generates :cpp
 
   belongs_to :user
   has n,     :little_fleas
@@ -41,8 +37,6 @@ class LittleFlea
   include DataMapper::Resource
   extend DataMapper::MetaMapper::Extension
 
-  generates :cpp
- 
   belongs_to :dog
 
   property :id,       Serial
