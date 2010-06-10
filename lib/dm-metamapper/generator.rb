@@ -42,7 +42,7 @@ module DataMapper
         def inherited(klass)
           @subclasses ||= []
           @subclasses << klass
-          klass.instance_variable_set(:@generator_name, klass.name.split("::").last.snake_case)
+          klass.instance_variable_set(:@generator_name, klass.name.split("::").last.snake_case.to_sym)
           klass.instance_variable_set(:@setup_model_blk, Proc.new{})
           klass.instance_variable_set(:@config, Config.new)
         end
