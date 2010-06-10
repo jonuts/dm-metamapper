@@ -22,15 +22,13 @@ module DataMapper
 
         def run(model)
           @model = model
-          new(model, &@setup_model_blk).run
+          new(model).run
         end
 
         private
 
         def generates_file(type, name, opts={})
           opts.merge! :type => type, :generator => self
-
-          @generated_files ||= TemplateCollection.new
           @generated_files << Template.new(name, opts)
         end
 
@@ -44,6 +42,7 @@ module DataMapper
           klass.instance_variable_set(:@generator_name, klass.name.split("::").last.snake_case.to_sym)
           klass.instance_variable_set(:@setup_model_blk, Proc.new{})
           klass.instance_variable_set(:@config, Config.new)
+          klass.instance_variable_set(:@generated_files, TemplateCollection.new)
         end
       end
 

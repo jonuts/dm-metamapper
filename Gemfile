@@ -10,6 +10,7 @@ group :test do
   gem "data_objects"
   gem "do_sqlite3", do_gems_version
   gem "do_mysql", do_gems_version
+  gem "ZenTest"
 end
 
 group :deploy do
