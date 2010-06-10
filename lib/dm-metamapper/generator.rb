@@ -65,12 +65,16 @@ module DataMapper
 
       private
 
+      def models
+        DataMapper::MetaMapper.models
+      end
+
       def generate(template)
         if !File.exists? template.full_path
           raise NoTemplateError, "Template does not exist at path #{template.full_path}"
         end
 
-        compiled = ERB.new(File.read(template.full_path)).result
+        compiled = ERB.new(File.read(template.full_path)).result(binding)
         File.open(template.output_path, 'w') {|f| f << compiled}
       end
     end
