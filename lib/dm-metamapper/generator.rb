@@ -8,7 +8,6 @@ module DataMapper
       class << self
         attr_reader :subclasses,
                     :generated_files,
-                    :proxy_blk,
                     :config,
                     :setup_model_blk
 

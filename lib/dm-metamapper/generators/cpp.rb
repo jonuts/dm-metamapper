@@ -2,9 +2,7 @@ module DataMapper
   module MetaMapper
     module Generators
       class CPP < DataMapper::MetaMapper::Generator
-        config[:template_dir] = File.expand_path(
-          File.join(File.dirname(__FILE__), '../../templates/cpp')
-        )
+        config[:template_dir] = File.expand_path('../../templates/cpp', __FILE__)
 
         generates_file :global, "dmmm_identifiers.hpp"
         generates_file :global, "dmmm_comparators.hpp"
