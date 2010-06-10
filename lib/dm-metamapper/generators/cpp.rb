@@ -15,10 +15,10 @@ module DataMapper
         generates_file :global, "dmmm_dbface.h"
         generates_file :global, "dmmm_id.hpp"
 
-        generates_file :model, "O_instance.hpp", :template => "instance.hpp.erb"
-        generates_file :model, "T_class.hpp", :template => "class.hpp.erb"
+        generates_file :model, "O_instance.hpp", :template => "instance.hpp"
+        generates_file :model, "T_class.hpp", :template => "class.hpp"
 
-        setup_model do |model|
+        setup_model do
           key_to_parent = many_to_one.inject({}) do |hash, (r,m)|
             hash[m.child_key.first.name] = decolonize(m.parent_model_name.to_const_string)
             hash
@@ -30,7 +30,7 @@ module DataMapper
             elsif key_to_parent[prop.name.to_s]
               "Field<I_#{key_to_parent[prop.name.to_s]}>"
             else           
-              "F_#{decolonize(prop.primitive)}"
+              "F_#{decolonize(prop.primitive.to_s)}"
             end
 
             prop.instance_variable_set(:@cpp_name, cpp_name)

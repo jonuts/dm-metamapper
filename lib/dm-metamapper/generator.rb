@@ -1,13 +1,16 @@
 module DataMapper
   module MetaMapper
     class Generator
+      class NoTemplateError < StandardError; end
+
       @subclasses = []
 
       class << self
         attr_reader :subclasses,
                     :generated_files,
                     :proxy_blk,
-                    :config
+                    :config,
+                    :setup_model_blk
 
         def [](generator)
           @subclasses.find {|klass| klass.generator_name == generator}
@@ -39,17 +42,18 @@ module DataMapper
         def inherited(klass)
           @subclasses ||= []
           @subclasses << klass
-          klass.instance_variable_set(:@generator_name, klass.name.snake_case)
-          klass.instance_variable_set(:@setup_model_blk, lambda{|lolwut|})
+          klass.instance_variable_set(:@generator_name, klass.name.split("::").last.snake_case)
+          klass.instance_variable_set(:@setup_model_blk, Proc.new{})
           klass.instance_variable_set(:@config, Config.new)
         end
       end
 
       # model can be nil or DataMapper::Model
       def initialize(model)
-        yield model if model
-
         @model = model
+
+        instance_eval(&self.class.setup_model_blk) if model
+
         @templates = if model
           self.class.generated_files.models
         else
