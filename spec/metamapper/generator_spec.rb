@@ -16,7 +16,7 @@ describe "Generator" do
     end
 
     it "stores a block to extend models" do
-      blk = lambda { @__foo__ = "lol" }
+      blk = proc { @__foo__ = "lol" }
       MyGenerator.send(:setup_model, &blk)
       MyGenerator.setup_model_blk.should == blk
     end
