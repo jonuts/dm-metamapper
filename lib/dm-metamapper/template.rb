@@ -1,6 +1,7 @@
 module DataMapper
   module MetaMapper
     class NoGeneratorError < ArgumentError; end
+    class InvalidTypeError < StandardError; end
 
     class TemplateCollection < Array
       def models
@@ -13,11 +14,13 @@ module DataMapper
     end
 
     class Template
+      VALID_TYPES = [:global, :model]
+
       def initialize(name, opts={})
-        @name = name
-        @type = opts.delete(:type)
-        @generator = opts.delete(:generator) || raise(NoGeneratorError "opts did not contain :generator")
-        @template = (opts.delete(:template) || @name) + ".erb"
+        @name = name.to_s
+        @generator = parse_generator(opts.delete(:generator))
+        @type = parse_type(opts.delete(:type))
+        @template = (opts.delete(:template).to_s || @name) + ".erb"
       end
 
       attr_reader :name, :type
@@ -29,6 +32,21 @@ module DataMapper
 
       def full_path
         File.join(@generator.config.template_dir, @template)
+      end
+
+      private
+
+      def parse_type(type)
+        unless type && VALID_TYPES.include?(type.to_sym)
+          raise InvalidTypeError, "type `#{type}' is not a recognized template " + 
+                                  "type. Valid types: #{VALID_TYPES.inspect}]" 
+        end
+
+        type
+      end
+
+      def parse_generator(generator)
+        generator || raise(NoGeneratorError, "opts did not contain :generator")
       end
     end
   end
