@@ -21,12 +21,11 @@ module DataMapper
             hash[m.child_key.first.name] = decolonize(m.parent_model_name.to_const_string)
             hash
           end
-
           model.properties.each do |prop|
             cpp_name = if prop.serial?
               "Field<I_#{decolonize(model.name)}>"
-            elsif key_to_parent[prop.name.to_s]
-              "Field<I_#{key_to_parent[prop.name.to_s]}>"
+            elsif key_to_parent[prop.name]
+              "Field<I_#{key_to_parent[prop.name]}>"
             else           
               "F_#{decolonize(prop.primitive.to_s)}"
             end
@@ -47,6 +46,14 @@ module DataMapper
           @many_to_one ||= model.relationships.select {|r,m|
             m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'
           }
+          #in case of ruby < 1.9
+          if Array === @many_to_one
+            temp = @many_to_one
+            @many_to_one = {}
+            temp.each{|t| @many_to_one[t[0]] = t[1]}
+          end
+
+          @many_to_one
         end
       end
     end
