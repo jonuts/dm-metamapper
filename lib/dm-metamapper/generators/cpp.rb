@@ -35,6 +35,11 @@ module DataMapper
           end
         end
 
+        def output_path(model, template)
+          name = model ? template.name.sub("%model%", decolonize(model.name)) : template.name
+          File.join(self.class.config.output_dir, name)
+        end
+
         private
 
         def decolonize(str)

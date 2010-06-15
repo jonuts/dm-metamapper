@@ -25,9 +25,8 @@ module DataMapper
 
       attr_reader :name, :type
 
-      def output_path(model)
-        name = model ? @name.sub("%model%", model.name) : @name
-        File.join(@generator.config.output_dir, name)
+      def output_path
+        File.join(@generator.config.output_dir, @name)
       end
 
       def full_path
