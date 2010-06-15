@@ -31,7 +31,8 @@ module DataMapper
               "F_#{decolonize(prop.primitive.to_s)}"
             end
 
-            prop.instance_variable_set(:@cpp_name, cpp_name)
+            (class << prop; self; end).instance_eval{ attr_accessor :cpp_name }
+            prop.cpp_name = cpp_name
           end
         end
 

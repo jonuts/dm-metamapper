@@ -44,7 +44,7 @@ public:
         }
         std::string _field;
         typedef T_<%= class_name %>::Condition ConditionType;
-        typedef <%= property.instance_variable_get(:@cpp_name) %>::Base ComparerType;
+        typedef <%= property.cpp_name %>::Base ComparerType;
     };
 
     E_<%= property.name %> _<%= property.name %>(){ 
@@ -74,7 +74,7 @@ public:
         for(size_t i = 0; i < res.size(); ++i){
             <% model.generated_properties.each do |property| %>
             r[i]._f_<%= property.name %>._base = 
-                UTILS::fromString<<%= property.instance_variable_get(:@cpp_name) %>::Base>(res[i]["<%= property.name %>"]);
+                UTILS::fromString<<%= property.cpp_name %>::Base>(res[i]["<%= property.name %>"]);
             <% end %>
         }
     }
