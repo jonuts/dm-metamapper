@@ -20,8 +20,9 @@ module DataMapper
           @generator_name = name
         end
 
-        def run(model)
+        def run(model, opts)
           @model = model
+          @config.use :output_dir => opts[:output_dir] if opts[:output_dir]
           new(model).run
         end
 

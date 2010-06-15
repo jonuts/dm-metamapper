@@ -17,11 +17,15 @@ module DataMapper
         @models << klass unless models.member?(klass)
       end
 
-      def generate(format, context=nil)
+      def generate(format, opts = {})
+        context = opts.delete(:context)
         generator = Generator[format]
-        generator.run(context)
+        generator.run(context, opts)
 
-        models.each {|model| generate(format,model)} if !context
+        models.each {|model| 
+          opts[:context] = model
+          generate(format, opts)
+        } if !context
       end
     end
   end
