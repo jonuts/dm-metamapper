@@ -20,7 +20,7 @@ module DataMapper
         @name = name.to_s
         @generator = parse_generator(opts.delete(:generator))
         @type = parse_type(opts.delete(:type))
-        @template = (opts.delete(:template).to_s || @name) + ".erb"
+        @template = (opts.delete(:template) || @name).to_s + ".erb"
       end
 
       attr_reader :name, :type
