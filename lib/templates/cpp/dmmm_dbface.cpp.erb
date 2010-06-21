@@ -8,10 +8,28 @@ DBFace* DBFace::_this = NULL;
 
 DBFace::DBFace(const string& database, const string& host, 
 	       const string& user, const string& password)
+    : _os(cout)
 {
     _this = this;
     if (!_connection.connect(database.c_str(), host.c_str(), 
-			     user.c_str(), password.c_str())){
+			     user.c_str(), password.c_str()))
+    {
+        _os << "Could not connect to DB";        
+        cerr << "Could not connect to DB";
+        exit(-1);
+    }     
+}
+
+DBFace::DBFace(const string& database, const string& host, 
+               const string& user, const string& password,
+               ostream& os)
+    : _os(os)
+{
+    _this = this;
+    if (!_connection.connect(database.c_str(), host.c_str(), 
+			     user.c_str(), password.c_str()))
+    {
+        _os << "Could not connect to DB";
         cerr << "Could not connect to DB";
         exit(-1);
     }     
@@ -41,7 +59,7 @@ DBFace::select(const std::vector<std::string>& tables,
 	q << " WHERE " << where;
     if (additional.size())
 	q << " " << additional;
-    cout << q << endl;
+    _os << q << endl;
     StoreQueryResult mysqlRes;
     try{
 	mysqlRes = q.store();
@@ -72,7 +90,7 @@ DBFace::erase(const std::vector<std::string>& tables,
         q << " INNER JOIN " + tables[i];
     if (where.size())
 	q << " WHERE " << where;
-    cout << q << endl;
+    _os << q << endl;
     return executeQuery(q);
     
 }
@@ -97,7 +115,7 @@ DBFace::getLastInsertId(Query& rQuery, size_t& rId)
 {
     try{
         rId = rQuery.insert_id();
-        cout << "got last insert ID: " << rId << endl;
+        _os << "got last insert ID: " << rId << endl;
     }
     catch (const mysqlpp::Exception& er) {
         return false;
@@ -131,7 +149,7 @@ DBFace::insert(const string& table,
 	q << quote << it->second;
     }
     q << ")";
-    cout << q << endl;
+    _os << q << endl;
     bool ok = executeQuery(q);
     ok = ok && getLastInsertId(q, rInsertId);
     return ok;
@@ -154,7 +172,7 @@ DBFace::update(const string& table,
     }
     if (where.size())
 	q << " WHERE " << where;
-    cout << q << endl;
+    _os << q << endl;
     return executeQuery(q);
 }
 

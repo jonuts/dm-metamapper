@@ -2,6 +2,7 @@
 #define DMMM_DBFACE_H
 
 #include <map>
+#include <iosfwd>
 #include <mysql++.h>
 #include <boost/thread/mutex.hpp>
 
@@ -15,6 +16,9 @@ public:
     
     DBFace(const std::string& database, const std::string& host, 
 	   const std::string& user, const std::string& password);
+    DBFace(const std::string& database, const std::string& host, 
+	   const std::string& user, const std::string& password,
+	   std::ostream& os);
     
     bool insert(const std::string& table, 
 		const std::map<std::string, std::string>& field2Val,
@@ -40,6 +44,7 @@ private:
     mysqlpp::Connection                 _connection;
     mutable boost::mutex                _mutex;
     static DBFace*                      _this;		
+    std::ostream&                       _os;
 };
 
 } //namespace DMMM
