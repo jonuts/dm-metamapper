@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
      "README.md",
      "Rakefile",
      "VERSION",
+     "dm-metamapper.gemspec",
      "example/.gitignore",
      "example/Makefile",
      "example/example.cpp",
