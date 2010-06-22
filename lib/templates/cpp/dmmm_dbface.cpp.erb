@@ -38,23 +38,23 @@ DBFace::DBFace(const string& database, const string& host,
 }
 
 void
-DBFace::log(const std::string& message)
+DBFace::log(const string& message)
 {
     if (_os)
 	(*_os) << message;
 }
 
 void
-DBFace::logError(const std::string& message)
+DBFace::logError(const string& message)
 {
     log(string("ERROR: ") + message);
 }
 
 bool
-DBFace::select(const std::vector<std::string>& tables, 
-	       const std::vector<string>& columns,
-	       const std::string& where, 
-	       const std::string& additional, 
+DBFace::select(const vector<string>& tables, 
+	       const vector<string>& columns,
+	       const string& where, 
+	       const string& additional, 
 	       QueryRes& rRes)
 {
     boost::mutex::scoped_lock lock(_mutex);
@@ -92,10 +92,39 @@ DBFace::select(const std::vector<std::string>& tables,
     return true;
 }
 
+size_t
+DBFace::count(const vector<string>& tables, 
+	      const string& where)
+{
+    boost::mutex::scoped_lock lock(_mutex);
+
+    Query q = _connection.query();
+    
+    q << "SELECT count(*) as count FROM " << tables[0];
+    for (size_t i = 1; i < tables.size(); ++i)
+        q << ", " + tables[i];
+    if (where.size())
+	q << " WHERE " << where;
+    log(q.str());
+    StoreQueryResult mysqlRes;
+    try{
+	mysqlRes = q.store();
+    }
+    catch (const mysqlpp::Exception& er) {
+	logError(er.what());
+        return false;
+    }
+
+    if (mysqlRes.num_rows() == 1)
+	return UTILS::fromString<size_t>(UTILS::toString(mysqlRes[0]["count"]));
+    else
+        return 0;    
+}
+
 
 bool 
-DBFace::erase(const std::vector<std::string>& tables, 
-   	      const std::string& where)
+DBFace::erase(const vector<string>& tables, 
+   	      const string& where)
 {
     Query q = _connection.query();
     q << "DELETE FROM " << tables[0];

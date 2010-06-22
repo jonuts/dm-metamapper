@@ -79,6 +79,12 @@ public:
         }
     }
 
+    size_t count(const Condition& c)
+    {
+        Condition c1 = _constraint.nil() ? c : _constraint && c;
+	return DBFace::instance()->count(_tables, c1._cond);
+    }
+
     void erase(const Condition& c)
     {
         Condition c1 = _constraint.nil() ? c : _constraint && c;

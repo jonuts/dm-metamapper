@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
     string user("root");
     string database("dmmm");
     string password("");
-    DBFace dbFace(database, host, user, password);
+    DBFace dbFace(database, host, user, password, &cout);
 
     T_Dog d;
     T_User u;
@@ -65,7 +65,10 @@ int main(int argc, char* argv[])
     T_Dog dconst(T_User(u._name() == "omer"));
     dogs.clear();
     dconst.select(d._stinks() == true, dogs);
-    cout << dogs.size() << " dogs meet criterion" << endl;
+    cout << dogs.size() 
+	 << " dogs meet criterion" << endl;
+    cout << dconst.count(d._stinks() == true) 
+	 << " dogs meet criterion" << endl;
     dconst.erase();
 
     d.erase(d._user_id() == u2._id());
