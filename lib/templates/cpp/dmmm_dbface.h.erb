@@ -18,7 +18,7 @@ public:
 	   const std::string& user, const std::string& password);
     DBFace(const std::string& database, const std::string& host, 
 	   const std::string& user, const std::string& password,
-	   std::ostream& os);
+	   std::ostream* os);
     
     bool insert(const std::string& table, 
 		const std::map<std::string, std::string>& field2Val,
@@ -37,6 +37,8 @@ public:
     std::string now(); 
     
 private:
+    void log(const std::string& message);
+    void logError(const std::string& message);
     bool getLastInsertId(mysqlpp::Query& rQuery, size_t& rId);
     bool executeQuery(mysqlpp::Query& rQuery);
     
@@ -44,7 +46,7 @@ private:
     mysqlpp::Connection                 _connection;
     mutable boost::mutex                _mutex;
     static DBFace*                      _this;		
-    std::ostream&                       _os;
+    std::ostream*                       _os;
 };
 
 } //namespace DMMM
