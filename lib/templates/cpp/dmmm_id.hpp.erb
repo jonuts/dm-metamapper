@@ -52,6 +52,7 @@ public:
 
 
     inline size_t& serialization() { return _id; }
+    inline const size_t& serialization() const { return _id; }
 
 private:
     size_t _id;
