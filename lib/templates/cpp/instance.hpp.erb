@@ -32,6 +32,12 @@ public:
         {}
     <% end %>
 
+    <% if model.serial %>
+    O_<%= class_name %>(const I_<%= class_name %>& id) 
+        : _f_<%= model.serial.name %>(id)
+        {}
+    <% end %>
+
     <% model.generated_properties.each do |property| %>
     const <%= property.cpp_name %>::Base& _<%= property.name %>() const { 
         return _f_<%= property.name %>._base; 
