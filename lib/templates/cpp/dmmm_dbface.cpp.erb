@@ -223,6 +223,7 @@ DBFace::update(const string& table,
 string 
 DBFace::now()
 {
+    boost::mutex::scoped_lock lock(_mutex);
     Query q = _connection.query();
     
     q << "SELECT NOW()";
