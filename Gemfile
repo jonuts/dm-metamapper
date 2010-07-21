@@ -4,6 +4,8 @@ dm_gems_version   = "~> 0.10"
 do_gems_version   = "~> 0.10"
 
 gem "dm-core", dm_gems_version
+gem "dm-types", dm_gems_version
+
 
 group :test do
   gem "rspec"

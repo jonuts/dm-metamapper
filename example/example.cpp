@@ -30,6 +30,7 @@ int main(int argc, char* argv[])
     d1._user_id() = u1._id();
     d1._name() = "spot";
     d1._stinks() = true;
+    d1._color() = DOG_COLOR_WHITE;
     d1.insert();
 
     d1 = d.select(d1._id()).first;

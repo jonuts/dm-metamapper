@@ -16,6 +16,7 @@ end
 
 desc "local gem build and install"
 task :local do
+  sh "rvm ree@drive"
   sh "gem uninstall -a dm-metamapper"
   sh "gem build dm-metamapper.gemspec"
   version = File.read("VERSION").chomp

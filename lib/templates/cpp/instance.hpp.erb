@@ -16,6 +16,11 @@
 
 <%# self.relationships.select{|r,m| m.class.name == 'DataMapper::Associations::OneToMany::Relationship'}.each do |relative| %>
 <%# end %>
+
+<% model.enums.each do |name, property| %>
+enum Enum<%= class_name %><%= name %> { <%= property.type.flag_map.map{|v, k| class_name.upcase + "_" + property.name.to_s.upcase + "_" + k.to_s.upcase + " = " + v.to_s}.join(", ") %> };
+<% end %>
+
 namespace DMMM {
 
 class O_<%= class_name %>{
@@ -37,6 +42,7 @@ public:
         : _f_<%= model.serial.name %>(id)
         {}
     <% end %>
+
 
     <% model.generated_properties.each do |property| %>
     const <%= property.cpp_name %>::Base& _<%= property.name %>() const { 

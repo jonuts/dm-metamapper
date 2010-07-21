@@ -3,11 +3,17 @@ require "rubygems"
 require "bundler"
 Bundler.setup(:default, :test)
 require "dm-core"
+require "dm-types"
 require File.expand_path("../../lib/dm-metamapper.rb", __FILE__)
 require "dm-metamapper/generators/cpp"
 
 #DataMapper.setup(:default, "sqlite3::memory:")
 DataMapper.setup(:default, "mysql://root@localhost/dmmm")
+
+COLORS = [
+  :blue,
+  :white
+]
 
 class User
   include DataMapper::Resource
@@ -29,6 +35,7 @@ class Dog
   property :id,       Serial
   property :user_id,  Integer
   property :name,     String
+  property :color,    Enum[*COLORS]
   property :stinks,   Boolean
 end
 

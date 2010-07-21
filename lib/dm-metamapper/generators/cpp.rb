@@ -21,11 +21,16 @@ module DataMapper
             hash[m.child_key.first.name] = decolonize(m.parent_model_name.to_const_string)
             hash
           end
+          enums = {}
           model.properties.each do |prop|
             cpp_name = if prop.serial?
               "Field<I_#{decolonize(model.name)}>"
             elsif key_to_parent[prop.name]
               "Field<I_#{key_to_parent[prop.name]}>"
+            elsif prop.type.ancestors.include?(DataMapper::Types::Enum)
+              name = prop.name.to_s.upcase
+              enums[name] = prop
+              "Field<Enum#{decolonize(model.name)}#{name}>"
             else           
               "F_#{decolonize(prop.primitive.to_s)}"
             end
@@ -33,6 +38,8 @@ module DataMapper
             (class << prop; self; end).instance_eval{ attr_accessor :cpp_name }
             prop.cpp_name = cpp_name
           end
+          (class << model; self; end).instance_eval{ attr_accessor :enums }
+          model.enums = enums
         end
 
         def output_path(model, template)
