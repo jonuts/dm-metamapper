@@ -12,7 +12,8 @@ DataMapper.setup(:default, "mysql://root@localhost/dmmm")
 
 COLORS = [
   :blue,
-  :white
+  :white,
+  "light.red"
 ]
 
 class User

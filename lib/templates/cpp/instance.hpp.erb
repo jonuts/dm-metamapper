@@ -18,7 +18,7 @@
 <%# end %>
 
 <% model.enums.each do |name, property| %>
-enum Enum<%= class_name %><%= name %> { <%= property.type.flag_map.map{|v, k| class_name.upcase + "_" + property.name.to_s.upcase + "_" + k.to_s.upcase + " = " + v.to_s}.join(", ") %> };
+enum Enum<%= class_name %><%= name %> { <%= property.type.flag_map.map{|v, k| class_name.upcase + "_" + property.name.to_s.upcase + "_" + k.to_s.sub(".","_").upcase + " = " + v.to_s}.join(", ") %> };
 <% end %>
 
 namespace DMMM {
