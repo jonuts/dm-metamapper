@@ -74,7 +74,7 @@ public:
         for(size_t i = 0; i < res.size(); ++i){
             <% model.generated_properties.each do |property| %>
             r[i]._f_<%= property.name %>._base = 
-            <% if property.type.ancestors.include?(DataMapper::Types::Enum) %>
+            <% if DataMapper::Property::Enum === property %>
                 (<%= property.cpp_name %>::Base)UTILS::fromString<size_t>(res[i]["<%= property.name %>"]);
             <% else %>
                 UTILS::fromString<<%= property.cpp_name %>::Base>(res[i]["<%= property.name %>"]);

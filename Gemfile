@@ -11,6 +11,7 @@ group :test do
   gem "rspec"
   gem "dm-sqlite-adapter", do_gems_version
   gem "dm-mysql-adapter", do_gems_version
+  gem "dm-migrations", dm_gems_version
   gem "ZenTest"
 end
 

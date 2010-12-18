@@ -4,6 +4,7 @@ require "bundler"
 Bundler.setup(:default, :test)
 require "dm-core"
 require "dm-types"
+require "dm-migrations"
 require File.expand_path("../../lib/dm-metamapper.rb", __FILE__)
 require "dm-metamapper/generators/cpp"
 
@@ -48,3 +49,5 @@ class LittleFlea
   property :id,       Serial
   property :dog_id,   Integer
 end
+
+DataMapper.auto_migrate!

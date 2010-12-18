@@ -1,4 +1,5 @@
-$:.push File.dirname(__FILE__)
+lib = File.dirname(__FILE__)
+$:.push lib unless $:.include?(lib)
 
 require 'dm-core'
 require 'dm-metamapper/property'

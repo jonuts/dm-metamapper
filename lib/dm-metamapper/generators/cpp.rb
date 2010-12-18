@@ -27,7 +27,7 @@ module DataMapper
               "Field<I_#{decolonize(model.name)}>"
             elsif key_to_parent[prop.name]
               "Field<I_#{key_to_parent[prop.name]}>"
-            elsif prop.type.ancestors.include?(DataMapper::Types::Enum)
+            elsif DataMapper::Property::Enum === prop
               name = prop.name.to_s.upcase
               enums[name] = prop
               "Field<Enum#{decolonize(model.name)}#{name}>"
