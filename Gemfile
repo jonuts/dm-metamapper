@@ -1,7 +1,7 @@
 source :rubygems
 
-dm_gems_version   = "~> 0.10"
-do_gems_version   = "~> 0.10"
+dm_gems_version   = "~> 1.0"
+do_gems_version   = "~> 1.0"
 
 gem "dm-core", dm_gems_version
 gem "dm-types", dm_gems_version
@@ -9,9 +9,8 @@ gem "dm-types", dm_gems_version
 
 group :test do
   gem "rspec"
-  gem "data_objects"
-  gem "do_sqlite3", do_gems_version
-  gem "do_mysql", do_gems_version
+  gem "dm-sqlite-adapter", do_gems_version
+  gem "dm-mysql-adapter", do_gems_version
   gem "ZenTest"
 end
 
