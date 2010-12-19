@@ -15,8 +15,5 @@ group :test do
   gem "ZenTest"
 end
 
-group :deploy do
-  gem "jeweler"
-end
 
 # vim: set ft=ruby:
