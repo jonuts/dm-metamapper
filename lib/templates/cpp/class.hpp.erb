@@ -34,6 +34,13 @@ public:
         if (!parent._constraint.nil())
 	_constraint._cond += " AND " + parent._constraint._cond;
     } 
+
+    T_<%= class_name %>(const I_<%= parent %>& parentId)
+    {
+        _tables.push_back("<%= model.storage_name %>");
+        
+        _constraint._cond = "(<%= model.storage_name + "." + r[1].child_key.first.name.to_s %> = " + parentId.to_s() + ")";
+    } 
     <% end %>
     
     <% model.generated_properties.each do |property| %>
