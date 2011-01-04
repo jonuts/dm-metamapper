@@ -17,10 +17,10 @@ module DataMapper
       VALID_TYPES = [:global, :model]
 
       def initialize(name, opts={})
-        @name = name.to_s
-        @generator = parse_generator(opts.delete(:generator))
-        @type = parse_type(opts.delete(:type))
-        @template = (opts.delete(:template) || @name).to_s + ".erb"
+        @name          = name.to_s
+        @generator     = parse_generator(opts.delete(:generator))
+        @type          = parse_type(opts.delete(:type))
+        @template_name = parse_template(opts.delete(:template))
       end
 
       attr_reader :name, :type
@@ -30,7 +30,7 @@ module DataMapper
       end
 
       def full_path
-        File.join(@generator.config.template_dir, @template)
+        File.join(@generator.config.template_dir, @template_name)
       end
 
       private
@@ -46,6 +46,10 @@ module DataMapper
 
       def parse_generator(generator)
         generator || raise(NoGeneratorError, "opts did not contain :generator")
+      end
+
+      def parse_template(template)
+        (template || @name).to_s + ".erb"
       end
     end
   end
