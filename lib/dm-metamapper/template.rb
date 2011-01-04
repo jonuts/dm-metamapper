@@ -36,12 +36,10 @@ module DataMapper
       private
 
       def parse_type(type)
-        unless type && VALID_TYPES.include?(type.to_sym)
-          raise InvalidTypeError, "type `#{type}' is not a recognized template " + 
-                                  "type. Valid types: #{VALID_TYPES.inspect}]" 
-        end
+        return type if type && VALID_TYPES.include?(type.to_sym)
 
-        type
+        raise InvalidTypeError, "type `#{type}' is not a recognized template " + 
+                                "type. Valid types: #{VALID_TYPES.inspect}]" 
       end
 
       def parse_generator(generator)
