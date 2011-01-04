@@ -77,7 +77,7 @@ module DataMapper
           raise NoTemplateError, "Template does not exist at path #{template.full_path}"
         end
 
-        compiled = ERB.new(File.read(template.full_path)).result(binding)
+        compiled = ERB.new(File.read(template.full_path), nil, "%<>-").result(binding)
         path = respond_to?(:output_path) ? output_path(model, template) : template.output_name
         if !File.exists?(path) || File.read(path) != compiled
           File.open(path, 'w') {|f| f << compiled}

@@ -5,12 +5,11 @@
 
 namespace DMMM {
 
-<% models.each do |model| %>
-<% model_name = decolonize(model.name) %>
+<%- models.each do |model| -%>
+<%- model_name = decolonize(model.name) -%>
 class DummyO_<%= model_name %>;
 typedef ID::Id<DummyO_<%= model_name %>> I_<%= model_name %>;
-<% end %>
-
+<%- end -%>
 
 } //namespace DMMM
 #endif //DMMM_IDENTIFIERS_HPP

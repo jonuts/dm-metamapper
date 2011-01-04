@@ -1,5 +1,5 @@
-<% class_name = decolonize(model.name) %>
-<% all_caps_name = class_name.upcase %>
+<%- class_name = decolonize(model.name) -%>
+<%- all_caps_name = class_name.upcase -%>
 #ifndef T_<%= all_caps_name %>
 #define T_<%= all_caps_name %>
 #include "O_<%= class_name %>.hpp"
@@ -22,17 +22,18 @@ public:
     {
         _tables.push_back("<%= model.storage_name %>");
     }
-    <% many_to_one.each do |r| %> 
-    <% parent = decolonize(r[1].parent_model_name) %>
+
+    <%- many_to_one.each do |r| -%> 
+    <%- parent = decolonize(r[1].parent_model_name) -%>
     T_<%= class_name %>(const T_<%= parent %>& parent)
     {
         _tables.push_back("<%= model.storage_name %>");
         _tables.insert(_tables.end(), 
-	               parent._tables.begin(), parent._tables.end());
+                       parent._tables.begin(), parent._tables.end());
         
         _constraint._cond = "(<%= model.storage_name + "." + r[1].child_key.first.name.to_s %> = " + parent._tables[0] + ".<%= r[1].parent_key.first.name.to_s %>)";
         if (!parent._constraint.nil())
-	_constraint._cond += " AND " + parent._constraint._cond;
+        _constraint._cond += " AND " + parent._constraint._cond;
     } 
 
     T_<%= class_name %>(const I_<%= parent %>& parentId)
@@ -41,9 +42,9 @@ public:
         
         _constraint._cond = "(<%= model.storage_name + "." + r[1].child_key.first.name.to_s %> = " + parentId.to_s() + ")";
     } 
-    <% end %>
+    <%- end -%>
     
-    <% model.generated_properties.each do |property| %>
+    <%- model.generated_properties.each do |property| -%>
     struct E_<%= property.name %>{
         E_<%= property.name %>() 
         {  
@@ -57,14 +58,14 @@ public:
     E_<%= property.name %> _<%= property.name %>(){ 
         return E_<%= property.name %>();
     }
-    <% end %>    
+    <%- end -%>    
 
     void getFields(std::vector<std::string>& rFields)
     {
         rFields.clear();
-        <% model.generated_properties.each do |property| %>
+        <%- model.generated_properties.each do |property| -%>
         rFields.push_back("<%= property.name %>");
-        <% end %>
+        <%- end -%>
     }
 
     void select(const Condition& c, 
@@ -79,21 +80,21 @@ public:
                                    additional, res);
         r.resize(res.size());
         for(size_t i = 0; i < res.size(); ++i){
-            <% model.generated_properties.each do |property| %>
+            <%- model.generated_properties.each do |property| -%>
             r[i]._f_<%= property.name %>._base = 
-            <% if DataMapper::Property::Enum === property %>
+            <%- if DataMapper::Property::Enum === property -%>
                 (<%= property.cpp_name %>::Base)UTILS::fromString<size_t>(res[i]["<%= property.name %>"]);
-            <% else %>
+            <%- else -%>
                 UTILS::fromString<<%= property.cpp_name %>::Base>(res[i]["<%= property.name %>"]);
-            <% end %>
-            <% end %>
+            <%- end -%>
+            <%- end -%>
         }
     }
 
     size_t count(const Condition& c)
     {
         Condition c1 = _constraint.nil() ? c : _constraint && c;
-	return DBFace::instance()->count(_tables, c1._cond);
+        return DBFace::instance()->count(_tables, c1._cond);
     }
 
     void erase(const Condition& c)
@@ -101,6 +102,7 @@ public:
         Condition c1 = _constraint.nil() ? c : _constraint && c;
         DBFace::instance()->erase(_tables, c1._cond);
     }
+
     void erase()
     {   
         DBFace::instance()->erase(_tables, _constraint._cond);
@@ -113,6 +115,7 @@ public:
         Condition c1 = _constraint.nil() ? c : _constraint && c;
         select(c1, "", r);
     }
+
     void select(std::vector<O_<%= class_name %>>& r)
     {
         select(_constraint, "", r);
@@ -136,10 +139,6 @@ public:
     std::pair<O_<%= class_name %>, bool> first(){
         return first(_constraint);
     }
-
-
-
-
 
     Condition                 _constraint;    
     std::vector<std::string>  _tables;
