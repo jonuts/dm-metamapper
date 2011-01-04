@@ -63,17 +63,17 @@ public:
                 UTILS::toString(_f_<%= property.name %>._base);
         <% end %>
         std::string where =
-	    "<%= model.serial.name %>=" + UTILS::toString(_f_<%= model.serial.name %>._base);
+            "<%= model.serial.name %>=" + UTILS::toString(_f_<%= model.serial.name %>._base);
         if (DBFace::instance()->update("<%= model.storage_name %>", 
                                        field2Val, where))
         {
             <% model.generated_properties.each do |property| %>
             _f_<%= property.name %>._dirty = false;
             <% end %>
-	    return true;
-	}
-	else
-	    return false;
+            return true;
+        }
+        else
+            return false;
     }
     <% end %>
 
@@ -88,7 +88,7 @@ public:
         if (DBFace::instance()->
                 insert("<%= model.storage_name %>", field2Val,
                        _f_<%= model.serial.name %>._base.serialization()))
-	<% else %>
+        <% else %>
         size_t id;
         if (DBFace::instance()->
                 insert("<%= model.storage_name %>", field2Val,
@@ -100,16 +100,16 @@ public:
             <% end %>
             return true;
         }
- 	else
-	    return false;
- 				   
+        else
+            return false;
+                                   
     }
 
     <% many_to_one.each do |r| %> 
     <% parent = decolonize(r[1].parent_model_name) %>
     std::pair<O_<%= parent %>, bool> <%= r[0] %>(){
         T_<%= parent %> T(T_<%= parent %>::E_<%= r[1].parent_key.first.name.to_s %>() == _<%= r[1].child_key.first.name.to_s %>());
-	return T.first();
+        return T.first();
     }
     <% end %>
 
