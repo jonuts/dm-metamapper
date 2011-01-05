@@ -169,6 +169,39 @@ DBFace::getLastInsertId(Query& rQuery, size_t& rId)
 
 bool 
 DBFace::insert(const string& table, 
+	       const vector<string>& fields,
+	       const vector<vector<string> >& rows)
+{
+    if (fields.size() == 0 || rows.size() == 0)
+	return true;
+
+    Query q = _connection.query();
+    q << "INSERT INTO " << table << " (";
+    for (size_t i = 0; i < fields.size(); ++i){
+	if (i != 0)
+	    q << ",";
+	q << fields[i];
+    }
+    q << ")VALUES";
+    for (size_t i = 0; i < rows.size(); ++i){
+	if (i != 0)
+	    q << ",";
+	q << "(";
+	for(size_t j = 0; j < rows[i].size(); ++j){
+	    if (j != 0)
+		q << ",";
+	    q << quote << rows[i][j];
+	}
+	q << ")";
+    }
+    log(q.str());
+    bool ok = executeQuery(q);
+    return ok;
+}
+
+
+bool 
+DBFace::insert(const string& table, 
 	       const map<string, string>& field2Val,
 	       size_t& rInsertId)
 {

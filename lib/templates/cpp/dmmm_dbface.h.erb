@@ -23,6 +23,11 @@ public:
     bool insert(const std::string& table, 
 		const std::map<std::string, std::string>& field2Val,
 		size_t& rInsertId);
+    bool insert(const std::string& table, 
+	        const std::vector<std::string>& fields,
+	        const std::vector<std::vector<std::string> >& rows);
+
+
     bool update(const std::string& table, 
 		const std::map<std::string, std::string>& field2Val,
 		const std::string& where);
