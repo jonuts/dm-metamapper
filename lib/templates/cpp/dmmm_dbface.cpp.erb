@@ -158,6 +158,7 @@ DBFace::executeQuery(Query& q)
 bool
 DBFace::getLastInsertId(Query& rQuery, size_t& rId)
 {
+    boost::mutex::scoped_lock lock(_mutex);
     try{
         rId = rQuery.insert_id();
     }
