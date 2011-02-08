@@ -136,6 +136,7 @@ DBFace::erase(const vector<string>& tables,
     if (where.size())
 	q << " WHERE " << where;
     log(q.str());
+    boost::mutex::scoped_lock lock(_mutex);
     return executeQuery(q);
     
 }
@@ -144,7 +145,6 @@ DBFace::erase(const vector<string>& tables,
 bool
 DBFace::executeQuery(Query& q)
 {
-    boost::mutex::scoped_lock lock(_mutex);
     try{
         q.execute();
     }
@@ -197,6 +197,7 @@ DBFace::insert(const string& table,
 	q << ")";
     }
     log(q.str());
+    boost::mutex::scoped_lock lock(_mutex);
     bool ok = executeQuery(q);
     return ok;
 }
@@ -229,6 +230,7 @@ DBFace::insert(const string& table,
     }
     q << ")";
     log(q.str());
+    boost::mutex::scoped_lock lock(_mutex);
     bool ok = executeQuery(q);
     ok = ok && getLastInsertId(q, rInsertId);
     return ok;
@@ -252,6 +254,7 @@ DBFace::update(const string& table,
     if (where.size())
 	q << " WHERE " << where;
     log(q.str());
+    boost::mutex::scoped_lock lock(_mutex);
     return executeQuery(q);
 }
 
