@@ -2,7 +2,8 @@
 #include "dmmm_utils.hpp"
 using namespace mysqlpp;
 using namespace std;
-using namespace DMMM;
+
+namespace DMMM {
 
 DBFace* DBFace::_this = NULL;
 
@@ -191,7 +192,7 @@ DBFace::insert(const string& table,
 	for(size_t j = 0; j < rows[i].size(); ++j){
 	    if (j != 0)
 		q << ",";
-	    q << quote << rows[i][j];
+	    q << rows[i][j];
 	}
 	q << ")";
     }
@@ -225,7 +226,7 @@ DBFace::insert(const string& table,
     {
 	if (it != field2Val.begin())
 	    q << ",";
-	q << quote << it->second;
+	q << it->second;
     }
     q << ")";
     log(q.str());
@@ -248,7 +249,7 @@ DBFace::update(const string& table,
     {
 	if (it != field2Val.begin())
 	    q << ",";
-	q << it->first << "=" << quote << it->second;
+	q << it->first << "=" << it->second;
     }
     if (where.size())
 	q << " WHERE " << where;
@@ -274,3 +275,5 @@ DBFace::now()
     }
     return UTILS::toString(mysqlRes[0]["now()"]);
 }
+
+} //namespace DMMM

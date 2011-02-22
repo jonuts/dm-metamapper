@@ -5,6 +5,7 @@
 #include <iosfwd>
 #include <mysql++.h>
 #include <boost/thread/mutex.hpp>
+#include "dmmm_id.hpp"
 
 namespace DMMM {
 
@@ -55,6 +56,30 @@ private:
     static DBFace*                      _this;		
     std::ostream*                       _os;
 };
+
+
+
+
+template<class T>
+std::string
+toSQLString(const ID::Id<T>& id)
+{
+    mysqlpp::Query q(0);
+    q << mysqlpp::quote << id.to_s();	
+    
+    return q.str();
+}
+
+template<class T>
+std::string
+toSQLString(const T& t)
+{
+    mysqlpp::Query q(0);
+    q << mysqlpp::quote << t;	
+    
+    return q.str();
+}
+
 
 } //namespace DMMM
 
