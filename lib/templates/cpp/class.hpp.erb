@@ -155,7 +155,7 @@ public:
 	    std::vector<std::string> row;
 	    <%- model.generated_properties.each do |property| -%>
             <% if property.name != model.serial.name %>
-            row.push_back(UTILS::toString(r._<%= property.name %>()));
+            row.push_back(toSQLString(r._<%= property.name %>()));
             <%- end -%>
             <%- end -%>
 	    rows.push_back(row);

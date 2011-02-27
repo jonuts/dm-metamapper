@@ -60,7 +60,7 @@ public:
                 toSQLString(_f_<%= property.name %>._base);
         <%- end -%>
         std::string where =
-            "<%= model.serial.name %>=" + UTILS::toString(_f_<%= model.serial.name %>._base);
+            "<%= model.serial.name %>=" + toSQLString(_f_<%= model.serial.name %>._base);
         if (DBFace::instance()->update("<%= model.storage_name %>", 
                                        field2Val, where))
         {
