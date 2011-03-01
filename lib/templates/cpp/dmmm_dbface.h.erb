@@ -20,7 +20,8 @@ public:
     DBFace(const std::string& database, const std::string& host, 
 	   const std::string& user, const std::string& password,
 	   std::ostream* os);
-    
+    void connect();
+
     bool insert(const std::string& table, 
 		const std::map<std::string, std::string>& field2Val,
 		size_t& rInsertId);
@@ -55,6 +56,10 @@ private:
     mutable boost::mutex                _mutex;
     static DBFace*                      _this;		
     std::ostream*                       _os;
+    std::string                         _host;
+    std::string                         _user;
+    std::string                         _database;
+    std::string                         _password;
 };
 
 

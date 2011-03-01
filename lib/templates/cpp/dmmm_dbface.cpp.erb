@@ -9,33 +9,33 @@ DBFace* DBFace::_this = NULL;
 
 DBFace::DBFace(const string& database, const string& host, 
 	       const string& user, const string& password)
-    : _os(NULL)
+    : _os(NULL), _host(host), _user(user), _database(database),		
+      _password(password)
 {
     _this = this;
-    if (!_connection.connect(database.c_str(), host.c_str(), 
-			     user.c_str(), password.c_str()))
-    {
-	if (_os)
-	    (*_os) << "Could not connect to DB";        
-        cerr << "Could not connect to DB";
-        exit(-1);
-    }     
+    connect();
 }
 
 DBFace::DBFace(const string& database, const string& host, 
                const string& user, const string& password,
                ostream* os)
-    : _os(os)
+    : _os(os), _host(host), _user(user), _database(database),		
+      _password(password)
 {
     _this = this;
-    if (!_connection.connect(database.c_str(), host.c_str(), 
-			     user.c_str(), password.c_str()))
+    connect();
+}
+
+void
+DBFace::connect()
+{
+    if (!_connection.connect(_database.c_str(), _host.c_str(), 
+			     _user.c_str(), _password.c_str()))
     {
 	if (_os)
-	    (*_os) << "Could not connect to DB";
+	    (*_os) << "Could not connect to DB";        
         cerr << "Could not connect to DB";
-        exit(-1);
-    }     
+    }
 }
 
 void
