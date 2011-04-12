@@ -82,9 +82,9 @@ DBFace::select(const vector<string>& tables,
     }
     catch (const mysqlpp::Exception& er) {
 	logError(er.what());
-	if (q.str() == "MySQL server has gone away"){
-	    connect();
+	if (string(er.what()) == string("MySQL server has gone away")){
 	    sleep(10);
+	    connect();
 	}
         return false;
     }
@@ -118,7 +118,7 @@ DBFace::count(const vector<string>& tables,
     }
     catch (const mysqlpp::Exception& er) {
 	logError(er.what());
-	if (q.str() == "MySQL server has gone away"){
+	if (string(er.what()) == string("MySQL server has gone away")){
 	    connect();
 	    sleep(10);
 	}
