@@ -55,14 +55,14 @@ module DataMapper
 
         def many_to_one
           return unless model
-          @many_to_one ||= model.relationships.select {|r,m|
+          @many_to_one ||= model.relationships.select {|m|
             m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'
           }
           #in case of ruby < 1.9
           if Array === @many_to_one
             temp = @many_to_one
             @many_to_one = {}
-            temp.each{|t| @many_to_one[t[0]] = t[1]}
+            temp.each{|t| @many_to_one[t.name] = t}
           end
 
           @many_to_one
