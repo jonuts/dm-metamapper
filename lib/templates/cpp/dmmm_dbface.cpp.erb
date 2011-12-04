@@ -29,6 +29,9 @@ DBFace::DBFace(const string& database, const string& host,
 void
 DBFace::connect()
 {
+    if (_connection.connected())
+        _connection.disconnect();
+
     if (!_connection.connect(_database.c_str(), _host.c_str(), 
 			     _user.c_str(), _password.c_str()))
     {

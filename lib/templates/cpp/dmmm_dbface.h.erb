@@ -20,6 +20,9 @@ public:
     DBFace(const std::string& database, const std::string& host, 
 	   const std::string& user, const std::string& password,
 	   std::ostream* os);
+
+    ~DBFace() { _connection.disconnect(); }
+
     void connect();
 
     bool insert(const std::string& table, 
