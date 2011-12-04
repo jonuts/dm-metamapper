@@ -1,6 +1,6 @@
 module DataMapper 
   module MetaMapper
-    VERSION = "0.1.9" unless defined?(::DataMapper::MetaMapper::VERSION)
+    VERSION = "0.2.0" unless defined?(::DataMapper::MetaMapper::VERSION)
   end
   
 end
