@@ -3,6 +3,8 @@
 #ifndef T_<%= all_caps_name %>
 #define T_<%= all_caps_name %>
 #include "O_<%= class_name %>.hpp"
+
+
 namespace DMMM {
 
 class T_<%= class_name %>{
@@ -25,16 +27,6 @@ public:
 
     <%- many_to_one.each do |r| -%> 
     <%- parent = decolonize(r[1].parent_model_name) -%>
-    T_<%= class_name %>(const T_<%= parent %>& parent)
-    {
-        _tables.push_back("<%= model.storage_name %>");
-        _tables.insert(_tables.end(), 
-                       parent._tables.begin(), parent._tables.end());
-        
-        _constraint._cond = "(<%= model.storage_name + "." + r[1].child_key.first.name.to_s %> = " + parent._tables[0] + ".<%= r[1].parent_key.first.name.to_s %>)";
-        if (!parent._constraint.nil())
-        _constraint._cond += " AND " + parent._constraint._cond;
-    } 
 
     T_<%= class_name %>(const I_<%= parent %>& parentId)
     {
@@ -71,8 +63,7 @@ public:
     }
 
     std::vector<O_<%= class_name %>> 
-    select(const Condition& c, 
-    const std::string& additional)
+    select(const Condition& c, const std::string& additional)
     {
         std::vector<O_<%= class_name %>> ret;
         Condition c1 = _constraint.nil() ? c : _constraint && c;

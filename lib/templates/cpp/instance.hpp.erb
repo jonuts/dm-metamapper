@@ -10,8 +10,8 @@
 #include "dmmm_identifiers.hpp"
 #include "dmmm_fields.hpp"
 #include "dmmm_comparators.hpp"
-<%- many_to_one.each do |relative| -%>
-#include "T_<%= decolonize(relative[1].parent_model.to_s) %>.hpp"
+<%- one_to_many.each do |relative| -%>
+#include "T_<%= decolonize(relative[1].child_model.to_s) %>.hpp"
 <%- end -%>
 
 <%- model.enums.each do |name, property| -%>
@@ -26,9 +26,6 @@ public:
     O_<%= class_name %>() {}
     <%- many_to_one.each do |r| -%> 
     <%- parent = decolonize(r[1].parent_model_name) -%>
-    O_<%= class_name %>(const O_<%= parent %>& parent) 
-        : _f_<%= r[1].child_key.first.name.to_s %>(parent._<%= r[1].parent_key.first.name.to_s %>())
-        {}
     O_<%= class_name %>(const I_<%= parent %>& parent_id) 
         : _f_<%= r[1].child_key.first.name.to_s %>(parent_id)
         {}
@@ -40,6 +37,19 @@ public:
         {}
     <%- end -%>
 
+    <%- one_to_many.each do |relative| -%> 
+    std::vector<O_<%= decolonize(relative[1].child_model.to_s) %>> _<%= decolonize(relative[1].child_model.storage_name) %>() const
+    {
+        T_<%= decolonize(relative[1].child_model.to_s) %> table;
+        return table.select(table._<%= child_key(relative[1].child_model) %>() == _id());   
+    }
+    std::vector<O_<%= decolonize(relative[1].child_model.to_s) %>> 
+    _<%= decolonize(relative[1].child_model.storage_name) %>(const T_<%= decolonize(relative[1].child_model.to_s) %>::Condition& c) const
+    {
+        T_<%= decolonize(relative[1].child_model.to_s) %> table(c);
+        return table.select(table._<%= child_key(relative[1].child_model) %>() == _id());   
+    }
+    <%- end -%>
 
     <%- model.generated_properties.each do |property| -%>
     const <%= property.cpp_name %>::Base& _<%= property.name %>() const { 
@@ -101,15 +111,6 @@ public:
             return false;
                                    
     }
-
-    <%- many_to_one.each do |r| -%> 
-    <%- parent = decolonize(r[1].parent_model_name) -%>
-    std::pair<O_<%= parent %>, bool> <%= r[0] %>(){
-        T_<%= parent %> T(T_<%= parent %>::E_<%= r[1].parent_key.first.name.to_s %>() == _<%= r[1].child_key.first.name.to_s %>());
-        return T.first();
-    }
-    <%- end -%>
-
 private:
     <%- model.generated_properties.each do |property| -%>
     <%= property.cpp_name %> _f_<%= property.name %>;
