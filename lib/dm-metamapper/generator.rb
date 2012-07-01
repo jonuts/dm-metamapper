@@ -37,8 +37,8 @@ module DataMapper
           @setup_model_blk = blk
         end
 
-        def snake_case
-          self.gsub(/::/, '/').
+        def snake_case(s)
+          s.gsub(/::/, '/').
             gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
             gsub(/([a-z\d])([A-Z])/,'\1_\2').
             tr("-", "_").
@@ -48,7 +48,7 @@ module DataMapper
         def inherited(klass)
           @subclasses ||= []
           @subclasses << klass
-          klass.instance_variable_set(:@generator_name, klass.name.split("::").last.snake_case.to_sym)
+          klass.instance_variable_set(:@generator_name, snake_case(klass.name.split("::").last).to_sym)
           klass.instance_variable_set(:@setup_model_blk, Proc.new{})
           klass.instance_variable_set(:@config, Config.new)
           klass.instance_variable_set(:@generated_files, TemplateCollection.new)
