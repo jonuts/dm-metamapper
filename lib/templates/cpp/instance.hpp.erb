@@ -24,7 +24,7 @@ class O_<%= class_name %>{
 public:
 
     O_<%= class_name %>() {}
-    <%- many_to_one.each do |r| -%> 
+    <%- many_to_one.each do |r| -%>
     <%- parent = decolonize(r[1].parent_model_name) -%>
     O_<%= class_name %>(const I_<%= parent %>& parent_id) 
         : _f_<%= r[1].child_key.first.name.to_s %>(parent_id)
@@ -38,6 +38,8 @@ public:
     <%- end -%>
 
     <%- one_to_many.each do |relative| -%> 
+    <%- puts relative[1].child_model.inspect + " " +  relative[1].parent_model.inspect-%>
+    <%- puts "" -%>
     std::vector<O_<%= decolonize(relative[1].child_model.to_s) %>> _<%= decolonize(relative[1].child_model.storage_name) %>() const
     {
         T_<%= decolonize(relative[1].child_model.to_s) %> table;

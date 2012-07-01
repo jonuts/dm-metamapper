@@ -37,6 +37,14 @@ module DataMapper
           @setup_model_blk = blk
         end
 
+        def snake_case
+          self.gsub(/::/, '/').
+            gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
+            gsub(/([a-z\d])([A-Z])/,'\1_\2').
+            tr("-", "_").
+            downcase
+        end
+
         def inherited(klass)
           @subclasses ||= []
           @subclasses << klass
@@ -77,6 +85,7 @@ module DataMapper
           raise NoTemplateError, "Template does not exist at path #{template.full_path}"
         end
 
+#        puts "generating " + template.inspect
         compiled = ERB.new(File.read(template.full_path), nil, "%<>-").result(binding)
         path = respond_to?(:output_path) ? output_path(model, template) : template.output_name
         if !File.exists?(path) || File.read(path) != compiled
