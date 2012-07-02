@@ -291,4 +291,16 @@ DBFace::now()
     return UTILS::toString(mysqlRes[0]["now()"]);
 }
 
+string
+sanitize(const string& s)
+{
+    mysqlpp::Query q(0);
+    string escaped;
+    q.escape_string(&escaped, s.c_str());
+    q << escaped;	
+    
+    return q.str();
+}
+
+
 } //namespace DMMM
