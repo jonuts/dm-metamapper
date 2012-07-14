@@ -109,6 +109,12 @@ public:
         return select(c1, "");
     }
 
+    std::vector<O_<%= class_name %>> 
+    select(const std::string& additional)
+    {
+        return select(_constraint, additional);
+    }
+
     std::vector<O_<%= class_name %>> select()
     {
         return select(_constraint, "");
