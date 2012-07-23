@@ -40,15 +40,15 @@ module DataMapper
         
         def key_to_parent
           many_to_one.inject({}) do |hash, (r,m)|
-            hash[m.child_key.first.name] = decolonize(m.parent_model_name.to_const_string)
+            hash[m.child_key.first.name] = decolonize(m.parent_model_name)
             hash
           end
         end
 
         def child_key(child_model)
-          child_model.relationships.select {|m|
+          child_model.relationships.find {|k,m|
             m.class.name == 'DataMapper::Associations::ManyToOne::Relationship' && m.parent_model_name == model.name
-          }.first.child_key.first.name.to_s
+          }[1].child_key.first.name.to_s
         end
 
         def output_path(model, template)
@@ -64,29 +64,30 @@ module DataMapper
 
         def many_to_one
           return unless model
-          @many_to_one ||= model.relationships.select {|m|
+          @many_to_one ||= model.relationships.select {|k,m|
             m.class.name == 'DataMapper::Associations::ManyToOne::Relationship'
           }
+          
           #in case of ruby < 1.9
-          if Array === @many_to_one
-            temp = @many_to_one
-            @many_to_one = {}
-            temp.each{|t| @many_to_one[t.name] = t}
-          end
+#          if Array === @many_to_one
+#            temp = @many_to_one
+#            @many_to_one = {}
+#            temp.each{|t| @many_to_one[t.name] = t}
+#          end
 
           @many_to_one
         end
         def one_to_many
           return unless model
-          @one_to_many ||= model.relationships.select {|m|
+          @one_to_many ||= model.relationships.select {|k,m|
             m.class.name == 'DataMapper::Associations::OneToMany::Relationship'
           }
           #in case of ruby < 1.9
-          if Array === @one_to_many
-            temp = @one_to_many
-            @one_to_many = {}
-            temp.each{|t| @one_to_many[t.name] = t}
-          end
+#          if Array === @one_to_many
+#            temp = @one_to_many
+#            @one_to_many = {}
+#            temp.each{|t| @one_to_many[t.name] = t}
+#          end
 
           @one_to_many
         end
