@@ -1,3 +1,4 @@
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include "dmmm_dbface.h"
 #include "dmmm_utils.hpp"
 using namespace mysqlpp;
@@ -41,11 +42,21 @@ DBFace::connect()
     }
 }
 
+string 
+currentDateTime()
+{
+    using namespace boost::posix_time;
+    ptime now = second_clock::local_time();
+
+    return to_iso_extended_string(now);
+}
+
+
 void
 DBFace::log(const string& message)
 {
     if (_os)
-	(*_os) << "DMMM: " << message << endl;
+	(*_os) << currentDateTime() << " DMMM " << message << endl;
 }
 
 void

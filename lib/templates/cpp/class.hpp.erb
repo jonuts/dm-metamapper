@@ -162,6 +162,38 @@ public:
 					  fields, rows);
     }
 
+    bool insertDirtyFields(std::vector<O_<%= class_name %>>::const_iterator begin,
+                           std::vector<O_<%= class_name %>>::const_iterator end)
+    {
+        if (begin == end)
+            return true;
+        FieldsToRows fields2Rows;
+	for (std::vector<O_<%= class_name %>>::const_iterator it = begin; 
+             it != end; ++it)
+        {
+            std::vector<std::string> fields;
+            std::vector<std::string> row;
+	    <%- model.generated_properties.each do |property| -%>
+            <% if property.name != model.serial.name %>
+            if (it->_f_<%= property.name %>._dirty){
+                fields.push_back(std::string("<%= property.name %>"));
+                row.push_back(toSQLString(it->_<%= property.name %>()));
+            }
+            <%- end -%>
+            <%- end -%>
+            fields2Rows[fields].push_back(row);
+	}
+        bool ret = true;
+        for (FieldsToRows::const_iterator it = fields2Rows.begin();
+             it != fields2Rows.end(); ++it)
+        {
+            ret = DBFace::instance()->insert("<%= model.storage_name %>",
+                                             it->first, it->second) && ret;
+        }
+        return ret;
+    }
+
+
     Condition                 _constraint;    
     std::vector<std::string>  _tables;
 };
