@@ -10,7 +10,7 @@ DBFace* DBFace::_this = NULL;
 
 DBFace::DBFace(const string& database, const string& host, 
 	       const string& user, const string& password)
-    : _os(NULL), _host(host), _user(user), _database(database),		
+    : _connection(false), _os(NULL), _host(host), _user(user), _database(database),		
       _password(password)
 {
     _this = this;
@@ -20,7 +20,7 @@ DBFace::DBFace(const string& database, const string& host,
 DBFace::DBFace(const string& database, const string& host, 
                const string& user, const string& password,
                ostream* os)
-    : _os(os), _host(host), _user(user), _database(database),		
+    : _connection(false), _os(os), _host(host), _user(user), _database(database),		
       _password(password)
 {
     _this = this;
@@ -31,14 +31,23 @@ void
 DBFace::connect()
 {
     if (_connection.connected())
-        _connection.disconnect();
+        _connectiontion.disconnect();
 
+    if(!_connection.set_option(new mysqlpp::ReconnectOption(true))) {
+        cerr << "DB :: Can't set option to auto-reconnect";
+        if (_os)
+            (*_os) << "DB :: Can't set option to auto-reconnect";
+    }
+    if(!_connection.set_option(new mysqlpp::SetCharsetNameOption("utf8"))) {
+        cerr << "DB :: Can't set CharsetNameOption to utf8";
+        if (_os)
+            (*_os) << "DB :: Can't set CharsetNameOption to utf8";
+    }
     if (!_connection.connect(_database.c_str(), _host.c_str(), 
-			     _user.c_str(), _password.c_str()))
-    {
-	if (_os)
-	    (*_os) << "Could not connect to DB";        
-        cerr << "Could not connect to DB";
+          _user.c_str(), _password.c_str())) {
+        cerr << "DB :: Could not connect to DB";
+        if (_os)
+            (*_os) << "DB :: Could not connect to DB";
     }
 }
 
