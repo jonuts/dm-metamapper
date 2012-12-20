@@ -31,7 +31,7 @@ void
 DBFace::connect()
 {
     if (_connection.connected())
-        _connectiontion.disconnect();
+        _connection.disconnect();
 
     if(!_connection.set_option(new mysqlpp::ReconnectOption(true))) {
         cerr << "DB :: Can't set option to auto-reconnect";
