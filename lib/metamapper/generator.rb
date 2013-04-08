@@ -1,6 +1,6 @@
 module MetaMapper
   class Generator
-    class <<self
+    class << self
       attr_accessor :model_setup, :generated_files
 
       def subclasses
