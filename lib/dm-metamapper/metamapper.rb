@@ -18,7 +18,8 @@ module DataMapper
       end
 
       def generate(format, opts = {})
-        @models = opts[:models]
+        @models = opts[:models] if opts[:models]
+
         context = opts.delete(:context)
         generator = Generator[format]
         generator.run(context, opts)

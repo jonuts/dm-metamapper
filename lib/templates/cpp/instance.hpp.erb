@@ -31,9 +31,8 @@ public:
         {}
     <%- end -%>
 
-    <%- if model.serial -%>
-    O_<%= class_name %>(const I_<%= class_name %>& id) 
-        : _f_<%= model.serial.name %>(id)
+    <%- if model.key.first -%>O_<%= class_name %>(const I_<%= class_name %>& id) 
+        : _f_<%= model.key.first.name %>(id)
         {}
     <%- end -%>
 
@@ -61,7 +60,7 @@ public:
     }
     <%- end -%>
 
-    <%- if model.serial -%>
+    <%- if model.key.first -%>
     bool update(){
         std::map<std::string, std::string> field2Val;
         <%- model.generated_properties.each do |property| -%>
@@ -70,7 +69,7 @@ public:
                 toSQLString(_f_<%= property.name %>._base);
         <%- end -%>
         std::string where =
-            "<%= model.serial.name %>=" + toSQLString(_f_<%= model.serial.name %>._base);
+            "<%= model.key.first.name %>=" + toSQLString(_f_<%= model.key.first.name %>._base);
         if (DBFace::instance()->update("<%= model.storage_name %>", 
                                        field2Val, where))
         {
@@ -91,10 +90,10 @@ public:
             field2Val["<%= property.name %>"] = 
                 toSQLString(_f_<%= property.name %>._base);
         <%- end -%>
-        <% if model.serial %>
+        <% if model.key.first %>
         if (DBFace::instance()->
                 insert("<%= model.storage_name %>", field2Val,
-                       _f_<%= model.serial.name %>._base.serialization()))
+                       _f_<%= model.key.first.name %>._base.serialization()))
         <%- else -%>
         size_t id;
         if (DBFace::instance()->
