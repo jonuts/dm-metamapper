@@ -22,6 +22,8 @@ module DataMapper
         generator = Generator[format]
         generator.run(context, opts)
 
+        @models = models.select{ |m| m.key.size == 1}
+
         models.each {|model| 
           opts[:context] = model
           generate(format, opts)
