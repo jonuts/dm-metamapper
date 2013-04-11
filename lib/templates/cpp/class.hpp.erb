@@ -121,7 +121,7 @@ public:
     }
 
     std::pair<O_<%= class_name %>, bool> select(const I_<%= class_name %>& id){
-        return first(E_<%= model.serial.name %>() == id);
+        return first(E_<%= model.key.first.name %>() == id);
     }
 
     std::pair<O_<%= class_name %>, bool> first(const Condition& c)
