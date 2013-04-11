@@ -38,8 +38,6 @@ public:
     <%- end -%>
 
     <%- one_to_many.each do |relative| -%> 
-    <%- puts relative[1].child_model.inspect + " " +  relative[1].parent_model.inspect-%>
-    <%- puts "" -%>
     std::vector<O_<%= decolonize(relative[1].child_model.to_s) %>> _<%= decolonize(relative[1].child_model.storage_name) %>() const
     {
         T_<%= decolonize(relative[1].child_model.to_s) %> table;

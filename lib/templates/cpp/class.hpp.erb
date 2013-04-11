@@ -143,7 +143,7 @@ public:
     {
 	std::vector<std::string> fields;
         <%- model.generated_properties.each do |property| -%>
-        <% if property.name != model.serial.name %>
+        <% if property.name != model.key.first.name %>
         fields.push_back(std::string("<%= property.name %>"));
         <%- end -%>
         <%- end -%>
@@ -152,7 +152,7 @@ public:
 	    const O_<%= class_name %>& r = *begin;
 	    std::vector<std::string> row;
 	    <%- model.generated_properties.each do |property| -%>
-            <% if property.name != model.serial.name %>
+            <% if property.name != model.key.first.name %>
             row.push_back(toSQLString(r._<%= property.name %>()));
             <%- end -%>
             <%- end -%>
@@ -174,7 +174,7 @@ public:
             std::vector<std::string> fields;
             std::vector<std::string> row;
 	    <%- model.generated_properties.each do |property| -%>
-            <% if property.name != model.serial.name %>
+            <% if property.name != model.key.first.name %>
             if (it->_f_<%= property.name %>._dirty){
                 fields.push_back(std::string("<%= property.name %>"));
                 row.push_back(toSQLString(it->_<%= property.name %>()));
