@@ -25,10 +25,15 @@ module DataMapper
 
         @models = models.select{ |m| m.key.size == 1}
 
-        models.each {|model| 
+        models.each {|model|
+          puts "generating #{model}"
           opts[:context] = model
           generate(format, opts)
         } if !context
+      end
+
+      def has_class(klass)
+        @models.count{|m| m.name == klass} == 1
       end
     end
   end
