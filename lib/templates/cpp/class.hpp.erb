@@ -121,7 +121,6 @@ public:
     }
 
     std::pair<O_<%= class_name %>, bool> select(const I_<%= class_name %>& id){
-        <%- debugger %>
         return first(E_<%= model.key.first.name %>() == id);
     }
 
