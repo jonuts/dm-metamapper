@@ -72,7 +72,7 @@ module DataMapper
             temp = @many_to_one
             @many_to_one = {}
             temp.each{|t| @many_to_one[t.name] = t}
-          end
+          end 
           @many_to_one.select{|k,v| DataMapper::MetaMapper.has_class(v.parent_model_name)}
           @many_to_one
         end

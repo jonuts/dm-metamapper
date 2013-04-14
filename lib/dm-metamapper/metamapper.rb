@@ -19,13 +19,12 @@ module DataMapper
 
       def generate(format, opts = {})
         @models = opts[:models] if opts[:models]
-
+        @models = models.select{ |m| m.key.size == 1}
+        
         context = opts.delete(:context)
         generator = Generator[format]
         generator.run(context, opts)
-
-        @models = models.select{ |m| m.key.size == 1}
-
+      
         models.each {|model|
           puts "generating #{model}"
           opts[:context] = model
