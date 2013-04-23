@@ -11,20 +11,34 @@ module MetaMapper
     end
 
     def generate(format, opts={})
+      @models = opts[:models] if opts[:models]
+      # @models = models.select{ |m| m.key.size == 1}
+
       context = opts.delete(:context)
+
       generator = Generator[format].new(context, opts)
 
-      generator.run
-
+      generator.run!
+      
       unless context
         models.each do |model|
+          puts "generating #{model}"
           opts[:context] = model
           generate(format, opts)
         end
       end
     end
+    
+    def has_class(klass)
+        @models.count{|m| m.name == klass} == 1
+    end
+
   end
 end
+
+
+
+
 
 __END__
 

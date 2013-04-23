@@ -24,7 +24,7 @@ module DataMapper
         context = opts.delete(:context)
         generator = Generator[format]
         generator.run(context, opts)
-      
+        
         models.each {|model|
           puts "generating #{model}"
           opts[:context] = model
@@ -35,6 +35,7 @@ module DataMapper
       def has_class(klass)
         @models.count{|m| m.name == klass} == 1
       end
+
     end
   end
 end

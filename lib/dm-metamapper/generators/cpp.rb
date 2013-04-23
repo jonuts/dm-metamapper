@@ -17,6 +17,7 @@ module DataMapper
         generates_file :model, "T_%model%.hpp", :template => "class.hpp"
 
         setup_model do
+          binding.pry
           enums = {}
           model.properties.each do |prop|
             cpp_name = if prop.serial?
@@ -76,6 +77,7 @@ module DataMapper
           @many_to_one.select{|k,v| DataMapper::MetaMapper.has_class(v.parent_model_name)}
           @many_to_one
         end
+
         def one_to_many
           return unless model
           @one_to_many ||= model.relationships.select {|m|

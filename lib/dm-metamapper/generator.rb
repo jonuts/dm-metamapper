@@ -84,7 +84,7 @@ module DataMapper
         if !File.exists? template.full_path
           raise NoTemplateError, "Template does not exist at path #{template.full_path}"
         end
-
+        binding.pry
 #        puts "generating " + template.inspect
         compiled = ERB.new(File.read(template.full_path), nil, "%<>-").result(binding)
         path = respond_to?(:output_path) ? output_path(model, template) : template.output_name

@@ -4,7 +4,6 @@
 #include "dmmm_id.hpp"
 
 namespace DMMM {
-
 <%- models.each do |model| -%>
 <%- model_name = decolonize(model.name) -%>
 class DummyO_<%= model_name %>;

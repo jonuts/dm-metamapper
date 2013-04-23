@@ -14,9 +14,9 @@ module MetaMapper
       @name      = name.to_s
       @generator = opts.delete(:generator)
       @type      = opts.delete(:type)
-
       @template_name  = parse_template(opts.delete(:template))
-      @output_path    = opts[:output_path]
+
+      @output_path    = opts[:output_dir] #should be expanede?
       @full_path      = opts[:template_dir]
     end
 

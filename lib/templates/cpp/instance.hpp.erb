@@ -50,7 +50,7 @@ public:
     }
     <%- end -%>
 
-    <%- model.generated_properties.each do |property| -%>
+    <%- generated_properties.each do |property| -%>
     const <%= property.cpp_name %>::Base& _<%= property.name %>() const { 
         return _f_<%= property.name %>._base; 
     }
@@ -63,7 +63,7 @@ public:
     <%- if model.key.first -%>
     bool update(){
         std::map<std::string, std::string> field2Val;
-        <%- model.generated_properties.each do |property| -%>
+        <%- generated_properties.each do |property| -%>
         if (_f_<%= property.name %>._dirty)
             field2Val["<%= property.name %>"] = 
                 toSQLString(_f_<%= property.name %>._base);
@@ -73,7 +73,7 @@ public:
         if (DBFace::instance()->update("<%= model.storage_name %>", 
                                        field2Val, where))
         {
-            <%- model.generated_properties.each do |property| -%>
+            <%- generated_properties.each do |property| -%>
             _f_<%= property.name %>._dirty = false;
             <%- end -%>
             return true;
@@ -85,7 +85,7 @@ public:
 
     bool insert(){
         std::map<std::string, std::string> field2Val;
-        <%- model.generated_properties.each do |property| -%>
+        <%- generated_properties.each do |property| -%>
         if (_f_<%= property.name %>._dirty)
             field2Val["<%= property.name %>"] = 
                 toSQLString(_f_<%= property.name %>._base);
@@ -101,7 +101,7 @@ public:
                     id))
         <%- end -%>
         {
-            <%- model.generated_properties.each do |property| -%>
+            <%- generated_properties.each do |property| -%>
             _f_<%= property.name %>._dirty = false;
             <%- end -%>
             return true;
@@ -111,7 +111,7 @@ public:
                                    
     }
 private:
-    <%- model.generated_properties.each do |property| -%>
+    <%- generated_properties.each do |property| -%>
     <%= property.cpp_name %> _f_<%= property.name %>;
     <%- end -%>
 

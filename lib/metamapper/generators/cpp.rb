@@ -1,9 +1,11 @@
 module MetaMapper
   module Generators
     class CPP < MetaMapper::Generator
-      template_dir File.expand_path('../../../templates/cpp', __FILE__)
 
-      generates_file :global, "dmmm_identifiers.hpp"
+      template_dir File.expand_path('../../../templates/cpp', __FILE__)
+      output_dir File.expand_path('../../../../../drive-back/src/dmmm/', __FILE__)
+
+      generates_file :global, "dmmm_identifiers.hpp"   #, opts
       generates_file :global, "dmmm_comparators.hpp"
       generates_file :global, "dmmm_fields.hpp"
       generates_file :global, "dmmm_utils.hpp"
