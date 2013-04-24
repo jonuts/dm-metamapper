@@ -17,6 +17,11 @@ module MetaMapper
       generates_file :model, "O_%model%.hpp", :template => "instance.hpp"
       generates_file :model, "T_%model%.hpp", :template => "class.hpp"
 
+      def output_path(model, template)
+        name = model ? template.name.sub("%model%", decolonize(model.name)) : template.name
+        File.join(@output_dir, name)
+      end
+
     end
   end
 end

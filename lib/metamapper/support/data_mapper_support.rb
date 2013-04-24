@@ -1,6 +1,7 @@
 module MetaMapper
   module DataMapperSupport
 
+
     def setup_orm_specific_fields 
       enums = {}
       model.properties.each do |prop|
@@ -82,5 +83,6 @@ module MetaMapper
         [r.name, r]
       }]
     end
+    binding.pry
   end
 end

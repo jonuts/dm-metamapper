@@ -25,12 +25,6 @@ module DataMapper
       DataMapper::MetaMapper.generate(format, self)
     end
 
-    def generated_properties
-      @_generated_properties ||= properties.select {|prop|
-        !prop.options[:skip_generation]
-      }
-    end
-
   end
 end
 

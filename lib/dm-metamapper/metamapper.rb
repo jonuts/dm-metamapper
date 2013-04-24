@@ -27,6 +27,7 @@ module DataMapper
         
         models.each {|model|
           puts "generating #{model}"
+          debugger
           opts[:context] = model
           generate(format, opts)
         } if !context

@@ -6,7 +6,6 @@ require 'dm-core'
 require 'metamapper/metamapper'
 require 'metamapper/template'
 require 'metamapper/generator'
-#require 'metamapper/support/model'
 
 =begin
 require 'dm-metamapper/property'

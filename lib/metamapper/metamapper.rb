@@ -15,18 +15,14 @@ module MetaMapper
       # @models = models.select{ |m| m.key.size == 1}
 
       context = opts.delete(:context)
-
       generator = Generator[format].new(context, opts)
-
-      generator.run!
-      
-      unless context
-        models.each do |model|
+      generator.run()
+            
+      models.each { |model|
           puts "generating #{model}"
           opts[:context] = model
           generate(format, opts)
-        end
-      end
+      } if !context
     end
     
     def has_class(klass)

@@ -39,7 +39,7 @@ module MetaMapper
 
       def generates_file(type, name, opts={})
         opts.merge!(type: type, generator: self, template_dir: @template_dir, output_dir: @output_dir)
-        generated_files << Template.new(name, opts)
+        @generated_files << Template.new(name, opts)
       end
 
       def inherited(klass)
@@ -72,10 +72,14 @@ module MetaMapper
     attr_reader :templates, :opts
     attr_accessor :orm, :output_dir
 
-    def run!
+    def run
       templates.each do |template|
+        puts "generating " + template.inspect
         compiled = ERB.new(File.read(template.full_path), nil, "%<>-").result(binding)
-        File.open(template.output_path, 'w') {|f| f << compiled}
+        path = respond_to?(:output_path) ? output_path(model, template) : template.output_name
+        if !File.exists?(path) || File.read(path) != compiled
+          File.open(path, 'w') {|f| f << compiled}
+        end
       end
     end
 
@@ -106,6 +110,7 @@ module MetaMapper
     def add_support!
       case orm
       when :activerecord
+        binding
         require File.expand_path('../support/active_record_support', __FILE__)
         extend ActiveRecordSupport
       when :datamapper
