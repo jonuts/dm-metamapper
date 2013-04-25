@@ -1,9 +1,10 @@
 <%- class_name = decolonize(model.name) -%>
 <%- all_caps_name = class_name.upcase -%>
+<%- storage_name = table_name(model) -%>
+
 #ifndef T_<%= all_caps_name %>
 #define T_<%= all_caps_name %>
 #include "O_<%= class_name %>.hpp"
-
 
 namespace DMMM {
 
@@ -17,22 +18,22 @@ public:
 
     T_<%= class_name %>() 
     {
-        _tables.push_back("<%= model.storage_name %>");
+        _tables.push_back("<%= storage_name %>");
     }
     T_<%= class_name %>(const Condition& c) 
         : _constraint(c)
     {
-        _tables.push_back("<%= model.storage_name %>");
+        _tables.push_back("<%= storage_name %>");
     }
 
     <%- many_to_one.each do |r| -%> 
-    <%- parent = decolonize(r[1].parent_model_name) -%>
+    <%- parent = decolonize(parent_name(r)) -%>
 
     T_<%= class_name %>(const I_<%= parent %>& parentId)
     {
-        _tables.push_back("<%= model.storage_name %>");
+        _tables.push_back("<%= storage_name %>");
         
-        _constraint._cond = "(<%= model.storage_name + "." + r[1].child_key.first.name.to_s %> = " + parentId.to_s() + ")";
+        _constraint._cond = "(<%= storage_name + "." + get_key_to_parent(r) %> = " + parentId.to_s() + ")";
     } 
     <%- end -%>
     
@@ -40,7 +41,7 @@ public:
     struct E_<%= property.name %>{
         E_<%= property.name %>() 
         {  
-            _field = "<%= model.storage_name %>.<%= property.name.to_s %>";
+            _field = "<%= storage_name %>.<%= property.name.to_s %>";
         }
         std::string _field;
         typedef T_<%= class_name %>::Condition ConditionType;
@@ -74,8 +75,8 @@ public:
         ret.resize(res.size());
         for(size_t i = 0; i < res.size(); ++i){
             <%- generated_properties.each do |property| -%>
-            ret[i]._f_<%= property.name %>._base = 
-            <%- if DataMapper::Property::Enum === property -%>
+            ret[i]._f_<%= property.name %>._base =
+            <%- if is_enum?(property) -%>
                 (<%= property.cpp_name %>::Base)UTILS::fromString<size_t>(res[i]["<%= property.name %>"]);
             <%- else -%>
                 UTILS::fromString<<%= property.cpp_name %>::Base>(res[i]["<%= property.name %>"]);
@@ -121,7 +122,7 @@ public:
     }
 
     std::pair<O_<%= class_name %>, bool> select(const I_<%= class_name %>& id){
-        return first(E_<%= model.key.first.name %>() == id);
+        return first(E_<%= primary_key(model) %>() == id);
     }
 
     std::pair<O_<%= class_name %>, bool> first(const Condition& c)
@@ -143,7 +144,7 @@ public:
     {
 	std::vector<std::string> fields;
         <%- generated_properties.each do |property| -%>
-        <% if property.name != model.key.first.name %>
+        <% if property.name != primary_key(model) %>
         fields.push_back(std::string("<%= property.name %>"));
         <%- end -%>
         <%- end -%>
@@ -152,13 +153,13 @@ public:
 	    const O_<%= class_name %>& r = *begin;
 	    std::vector<std::string> row;
 	    <%- generated_properties.each do |property| -%>
-            <% if property.name != model.key.first.name %>
+            <% if property.name != primary_key(model) %>
             row.push_back(toSQLString(r._<%= property.name %>()));
             <%- end -%>
             <%- end -%>
 	    rows.push_back(row);
 	}
-        return DBFace::instance()->insert("<%= model.storage_name %>",
+        return DBFace::instance()->insert("<%= storage_name %>",
 					  fields, rows);
     }
 
@@ -174,7 +175,7 @@ public:
             std::vector<std::string> fields;
             std::vector<std::string> row;
 	    <%- generated_properties.each do |property| -%>
-            <% if property.name != model.key.first.name %>
+            <% if property.name != primary_key(model) %>
             if (it->_f_<%= property.name %>._dirty){
                 fields.push_back(std::string("<%= property.name %>"));
                 row.push_back(toSQLString(it->_<%= property.name %>()));
@@ -187,7 +188,7 @@ public:
         for (FieldsToRows::const_iterator it = fields2Rows.begin();
              it != fields2Rows.end(); ++it)
         {
-            ret = DBFace::instance()->insert("<%= model.storage_name %>",
+            ret = DBFace::instance()->insert("<%= storage_name %>",
                                              it->first, it->second) && ret;
         }
         return ret;

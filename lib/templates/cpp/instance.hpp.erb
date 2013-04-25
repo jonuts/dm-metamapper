@@ -11,12 +11,13 @@
 #include "dmmm_fields.hpp"
 #include "dmmm_comparators.hpp"
 <%- one_to_many.each do |relative| -%>
-#include "T_<%= decolonize(relative[1].child_model.to_s) %>.hpp"
+#include "T_<%= decolonize(child_model_name(relative)) %>.hpp"
 <%- end -%>
 
-<%- model.enums.each do |name, property| -%>
-enum Enum<%= class_name %><%= name %> { <%= property.flag_map.map{|v, k| class_name.upcase + "_" + property.name.to_s.upcase + "_" + k.to_s.sub(".","_").upcase + " = " + v.to_s}.join(", ") %> };
+<%- model.enums.each do |name, e| -%>
+enum Enum<%= class_name %><%= name %> { <%= get_enum(name, e, class_name) %> };
 <%- end -%>
+
 
 namespace DMMM {
 
@@ -25,28 +26,29 @@ public:
 
     O_<%= class_name %>() {}
     <%- many_to_one.each do |r| -%>
-    <%- parent = decolonize(r[1].parent_model_name) -%>
+    <%- parent = decolonize(parent_name(r)) -%>
     O_<%= class_name %>(const I_<%= parent %>& parent_id) 
-        : _f_<%= r[1].child_key.first.name.to_s %>(parent_id)
+        : _f_<%= get_key_to_parent(r) %>(parent_id)
         {}
     <%- end -%>
 
-    <%- if model.key.first -%>O_<%= class_name %>(const I_<%= class_name %>& id) 
-        : _f_<%= model.key.first.name %>(id)
+    <%- if primary_key(model) -%>O_<%= class_name %>(const I_<%= class_name %>& id) 
+        : _f_<%= primary_key(model) %>(id)
         {}
     <%- end -%>
 
-    <%- one_to_many.each do |relative| -%> 
-    std::vector<O_<%= decolonize(relative[1].child_model.to_s) %>> _<%= decolonize(relative[1].child_model.storage_name) %>() const
+    <%- one_to_many.each do |relative| -%>
+
+    std::vector<O_<%= decolonize(child_model_name(relative)) %>> _<%= decolonize(child_plural_name(relative)) %>() const
     {
-        T_<%= decolonize(relative[1].child_model.to_s) %> table;
-        return table.select(table._<%= child_key(relative[1].child_model) %>() == _id());   
+        T_<%= decolonize(child_model_name(relative)) %> table;
+        return table.select(table._<%= get_key_to_parent(relative) %>() == _id());   
     }
-    std::vector<O_<%= decolonize(relative[1].child_model.to_s) %>> 
-    _<%= decolonize(relative[1].child_model.storage_name) %>(const T_<%= decolonize(relative[1].child_model.to_s) %>::Condition& c) const
+    std::vector<O_<%= decolonize(child_model_name(relative)) %>> 
+    _<%= decolonize(get_key_to_parent(relative)) %>(const T_<%= decolonize(child_model_name(relative)) %>::Condition& c) const
     {
-        T_<%= decolonize(relative[1].child_model.to_s) %> table(c);
-        return table.select(table._<%= child_key(relative[1].child_model) %>() == _id());   
+        T_<%= decolonize(child_model_name(relative)) %> table(c);
+        return table.select(table._<%= get_key_to_parent(relative) %>() == _id());   
     }
     <%- end -%>
 
@@ -60,7 +62,7 @@ public:
     }
     <%- end -%>
 
-    <%- if model.key.first -%>
+    <%- if primary_key(model) -%>
     bool update(){
         std::map<std::string, std::string> field2Val;
         <%- generated_properties.each do |property| -%>
@@ -69,8 +71,8 @@ public:
                 toSQLString(_f_<%= property.name %>._base);
         <%- end -%>
         std::string where =
-            "<%= model.key.first.name %>=" + toSQLString(_f_<%= model.key.first.name %>._base);
-        if (DBFace::instance()->update("<%= model.storage_name %>", 
+            "<%= primary_key(model) %>=" + toSQLString(_f_<%= primary_key(model) %>._base);
+        if (DBFace::instance()->update("<%= table_name(model) %>", 
                                        field2Val, where))
         {
             <%- generated_properties.each do |property| -%>
@@ -90,14 +92,14 @@ public:
             field2Val["<%= property.name %>"] = 
                 toSQLString(_f_<%= property.name %>._base);
         <%- end -%>
-        <% if model.key.first %>
+        <% if primary_key(model) %>
         if (DBFace::instance()->
-                insert("<%= model.storage_name %>", field2Val,
-                       _f_<%= model.key.first.name %>._base.serialization()))
+                insert("<%= table_name(model) %>", field2Val,
+                       _f_<%= primary_key(model) %>._base.serialization()))
         <%- else -%>
         size_t id;
         if (DBFace::instance()->
-                insert("<%= model.storage_name %>", field2Val,
+                insert("<%= table_name(model) %>", field2Val,
                     id))
         <%- end -%>
         {

@@ -12,7 +12,6 @@ module MetaMapper
 
     def generate(format, opts={})
       @models = opts[:models] if opts[:models]
-      # @models = models.select{ |m| m.key.size == 1}
 
       context = opts.delete(:context)
       generator = Generator[format].new(context, opts)

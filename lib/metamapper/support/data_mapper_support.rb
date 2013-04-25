@@ -1,7 +1,6 @@
 module MetaMapper
   module DataMapperSupport
 
-
     def setup_orm_specific_fields 
       enums = {}
       model.properties.each do |prop|
@@ -37,6 +36,10 @@ module MetaMapper
         m.class.name == 'DataMapper::Associations::ManyToOne::Relationship' && m.parent_model_name == model.name
           }.first.child_key.first.name.to_s
     end
+    
+    def get_key_to_parent(r)
+      r[1].child_key.first.name.to_s
+    end
 
     def many_to_one
       return unless model
@@ -70,9 +73,40 @@ module MetaMapper
       @one_to_many
     end
 
+    def child_model_name(child)
+      child[1].child_model.to_s
+    end
+
+    # returns an enum in C
+    def get_enum(name, property, class_name)
+       property.flag_map.map{|v, k| class_name.upcase + "_" + property.name.to_s.upcase + "_" + k.to_s.sub(".","_").upcase + " = " + v.to_s}.join(", ")
+    end
+
+    def primary_key(model)
+      model.key.first
+    end
+    
+    def table_name(model)
+      model.storage_name
+    end
+
+    # the name my (many_to_one) child uses to refrence me : user_id
+    def parent_name(r)
+      r[1].parent_model_name
+    end
+
+    def child_plural_name(m)
+      r[1].child_model.to_s
+    end
+
     def generated_properties
       @generated_properties ||= model.properties
     end
+
+    def is_enum?(c)
+      DataMapper::Property::Enum === c
+    end
+
 
     private
 
@@ -83,6 +117,6 @@ module MetaMapper
         [r.name, r]
       }]
     end
-    binding.pry
+
   end
 end
