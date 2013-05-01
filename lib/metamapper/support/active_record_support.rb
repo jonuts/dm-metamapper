@@ -16,7 +16,6 @@ module MetaMapper
           enums[name] =  model.send("#{c.name}_native")# or just the enum
           "Field<Enum#{decolonize(model.name)}#{name}>"
         else   
-          binding.pry
           "F_#{decolonize(c.klass.to_s)}"
         end
         (class << c; self; end).instance_eval{ attr_accessor :cpp_name }
@@ -99,6 +98,7 @@ module MetaMapper
 
     def generated_properties
       @generated_properties ||= model.columns
+      binding.pry
     end
 
     def is_enum?(c)
