@@ -4,12 +4,12 @@ module MetaMapper
      def setup_orm_specific_fields 
       enums = {}
       # Adds cpp_name to each column
-      # Adds enums to model
+      # Adds enums to mode
       model.columns.each do |c|
         cpp_name = if c.primary
          "Field<I_#{decolonize(model.name)}>"
         elsif is_key_to_parent(c.name) # is this a key to a parent
-          "Field<I_#{decolonize(c.name)}>"  # uses column name
+          "Field<I_#{decolonize(get_column_parent_model_name(c))}>" 
         elsif model.methods.include?(:enum_field?) &&
               model.enum_field?(c.name.to_sym)
           name = c.name.upcase # enum name
@@ -76,6 +76,12 @@ module MetaMapper
 
     def table_name(model)
       model.table_name
+    end
+
+    def get_column_parent_model_name(c)
+      parents = model.reflect_on_all_associations(:belongs_to)  
+      parents.select!{ |r| r.foreign_key == c.name }
+      parents.first.class_name
     end
     
     def parent_name(r)
