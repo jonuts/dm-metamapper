@@ -58,8 +58,7 @@ module MetaMapper
       return unless model
       @one_to_many = model.reflect_on_all_associations(:has_many)
 
-      #what do we want to do with 'through'?
-      threws = @one_to_many.map{ |r| r.through_reflection }.compact
+      threws = @one_to_many.select{ |r| r.through_reflection }.compact
       @one_to_many = @one_to_many - threws
 
       @one_to_many.select!{ |v| MetaMapper.has_class(v.class_name) }
