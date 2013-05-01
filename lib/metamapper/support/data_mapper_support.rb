@@ -18,9 +18,7 @@ module MetaMapper
       (class << prop; self; end).instance_eval{ attr_accessor :cpp_name }
       prop.cpp_name = cpp_name
     end
-
       (class << model; self; end).instance_eval{ attr_accessor :enums }
-
       model.enums = enums
     end
     

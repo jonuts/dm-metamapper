@@ -15,8 +15,9 @@ module MetaMapper
           name = c.name.upcase # enum name
           enums[name] =  model.send("#{c.name}_native")# or just the enum
           "Field<Enum#{decolonize(model.name)}#{name}>"
-        else           
-          "F_#{decolonize(c.type.to_s).capitalize}"
+        else   
+          binding.pry
+          "F_#{decolonize(c.klass.to_s)}"
         end
         (class << c; self; end).instance_eval{ attr_accessor :cpp_name }
         c.cpp_name = cpp_name
