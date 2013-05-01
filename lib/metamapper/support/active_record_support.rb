@@ -98,7 +98,6 @@ module MetaMapper
 
     def generated_properties
       @generated_properties ||= model.columns
-      binding.pry
     end
 
     def is_enum?(c)
