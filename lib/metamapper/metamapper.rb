@@ -24,8 +24,8 @@ module MetaMapper
       } if !context
     end
     
-    def has_class(klass)
-        @models.count{|m| m.name == klass} == 1
+    def has_class(class_name)
+      !!@models.find{ |m| m.name == class_name }
     end
 
   end

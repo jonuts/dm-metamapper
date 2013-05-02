@@ -55,6 +55,7 @@ module MetaMapper
     # Handle all "has many" associations, excluding 'through' associations
     def one_to_many
       return unless model
+      return @one_to_many if @one_to_many
       @one_to_many = model.reflect_on_all_associations(:has_many)
 
       threws = @one_to_many.select{ |r| r.through_reflection }.compact

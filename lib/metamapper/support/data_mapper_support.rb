@@ -105,16 +105,5 @@ module MetaMapper
       DataMapper::Property::Enum === c
     end
 
-
-    private
-
-    def relationship_by_type(association)
-      Hash[model.relationships.select {|r|
-        r.class == association
-      }.map {|r|
-        [r.name, r]
-      }]
-    end
-
   end
 end
