@@ -1,19 +1,19 @@
 module MetaMapper
   module ActiveRecordSupport
 
+     # 1) convert every column name to a cpp_name
+     # 2) If enums are defined for the model, they are converted to cpp
      def setup_orm_specific_fields 
       enums = {}
-      # Adds cpp_name to each column
-      # Adds enums to mode
       model.columns.each do |c|
         cpp_name = if c.primary
          "Field<I_#{decolonize(model.name)}>"
-        elsif is_key_to_parent(c.name) # is this a key to a parent
+        elsif is_key_to_parent(c.name) 
           "Field<I_#{decolonize(get_column_parent_model_name(c))}>" 
         elsif model.methods.include?(:enum_field?) &&
               model.enum_field?(c.name.to_sym)
           name = c.name.upcase # enum name
-          enums[name] =  model.send("#{c.name}_native")# or just the enum
+          enums[name] =  model.send("#{c.name}_native")
           "Field<Enum#{decolonize(model.name)}#{name}>"
         else   
           "F_#{decolonize(c.klass.to_s)}"
@@ -21,7 +21,6 @@ module MetaMapper
         (class << c; self; end).instance_eval{ attr_accessor :cpp_name }
         c.cpp_name = cpp_name
       end
-
       (class << model; self; end).instance_eval{ attr_accessor :enums }
       model.enums = enums
     end
@@ -32,7 +31,7 @@ module MetaMapper
       keys.include?(name)
     end
  
-    # Returns the key (string) 'child_model' uses to reference me
+    # Returns the key (string) 'child_model' uses to reference me (the parent)
     # Probably dont need this method due to method 'get_key_to_parent'
     def child_key(child_model)
       children = child_model.reflect_on_all_associations(:belongs_to)
@@ -45,7 +44,7 @@ module MetaMapper
       r.foreign_key 
     end
 
-    # "belongs to"
+    # Handle all "belongs to" associations
     def many_to_one
       return unless model
       @many_to_one = model.reflect_on_all_associations(:belongs_to)
@@ -53,7 +52,7 @@ module MetaMapper
       @many_to_one
     end
 
-    # "has many"
+    # Handle all "has many" associations, excluding 'through' associations
     def one_to_many
       return unless model
       @one_to_many = model.reflect_on_all_associations(:has_many)
@@ -64,8 +63,7 @@ module MetaMapper
       @one_to_many.select!{ |v| MetaMapper.has_class(v.class_name) }
       @one_to_many
     end
-
-    # child => Child
+  
     def child_model_name(child)
       child.class_name
     end
@@ -76,12 +74,6 @@ module MetaMapper
 
     def table_name(model)
       model.table_name
-    end
-
-    def get_column_parent_model_name(c)
-      parents = model.reflect_on_all_associations(:belongs_to)  
-      parents.select!{ |r| r.foreign_key == c.name }
-      parents.first.class_name
     end
     
     def parent_name(r)
@@ -107,14 +99,10 @@ module MetaMapper
 
     private
 
-    # probably don't need this method
-    def relationship_by_type(association)
-      Hash[model.relationships.select {|r|
-        r.class == association
-      }.map {|r|
-        [r.name, r]
-      }]
+    def get_column_parent_model_name(c)
+      parents = model.reflect_on_all_associations(:belongs_to)  
+      parents.select!{ |r| r.foreign_key == c.name }
+      parents.first.class_name
     end
-  end
-
+  end # module active_record_support 
 end
