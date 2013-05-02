@@ -22,6 +22,11 @@ module MetaMapper
         File.join(@output_dir, name)
       end
 
+      # changed 'decolinized' method instead
+      def merge_derived_class_name(name)
+        str.sub(/::/,'')
+      end
+
     end
   end
 end

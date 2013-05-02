@@ -63,7 +63,6 @@ module MetaMapper
       add_support!
 
       setup_orm_specific_fields if model && Proc === model_setup
-
       # instance_eval(&model_setup) if model && Proc === model_setup
 
       @templates = model ? generated_files.models : generated_files.global
@@ -94,7 +93,7 @@ module MetaMapper
     end
 
     def decolonize(str)
-      str.sub(/::/,'_')
+      str.sub(/::/,'')
     end
 
     def generated_files
