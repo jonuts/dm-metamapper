@@ -41,7 +41,7 @@ module MetaMapper
 
     # my key to refernce parrent
     def get_key_to_parent(r)
-      r.foreign_key 
+      r.foreign_key  
     end
 
     # Handle all "belongs to" associations

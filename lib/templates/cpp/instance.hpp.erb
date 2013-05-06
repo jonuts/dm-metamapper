@@ -42,13 +42,13 @@ public:
     std::vector<O_<%= decolonize(child_model_name(relative)) %>> _<%= decolonize(child_plural_name(relative)) %>() const
     {
         T_<%= decolonize(child_model_name(relative)) %> table;
-        return table.select(table._<%= get_key_to_parent(relative) %>() == _id());   
+        return table.select(table._<%= child_key(relative.class_name.constantize) %>() == _id());   
     }
     std::vector<O_<%= decolonize(child_model_name(relative)) %>> 
-    _<%= decolonize(get_key_to_parent(relative)) %>(const T_<%= decolonize(child_model_name(relative)) %>::Condition& c) const
+        _<%= decolonize(child_plural_name(relative)) %>(const T_<%= decolonize(child_model_name(relative)) %>::Condition& c) const
     {
         T_<%= decolonize(child_model_name(relative)) %> table(c);
-        return table.select(table._<%= get_key_to_parent(relative) %>() == _id());   
+        return table.select(table._<%= child_key(relative.class_name.constantize) %>() == _id());   
     }
     <%- end -%>
 
