@@ -66,9 +66,14 @@ public:
     bool update(){
         std::map<std::string, std::string> field2Val;
         <%- generated_properties.each do |property| -%>
+          <%- if property.name == "updated_at" -%>
+            field2Val["<%= property.name %>"] = 
+                toSQLString("now()");
+          <%-else-%>
         if (_f_<%= property.name %>._dirty)
             field2Val["<%= property.name %>"] = 
                 toSQLString(_f_<%= property.name %>._base);
+          <%- end -%>
         <%- end -%>
         std::string where =
             "<%= primary_key(model) %>=" + toSQLString(_f_<%= primary_key(model) %>._base);
@@ -88,10 +93,16 @@ public:
     bool insert(){
         std::map<std::string, std::string> field2Val;
         <%- generated_properties.each do |property| -%>
+          <%- if property.name == "created_at" -%>
+            field2Val["<%= property.name %>"] = 
+                toSQLString("now()");
+          <%- else -%>
         if (_f_<%= property.name %>._dirty)
             field2Val["<%= property.name %>"] = 
                 toSQLString(_f_<%= property.name %>._base);
+          <%- end -%>
         <%- end -%>
+
         <% if primary_key(model) %>
         if (DBFace::instance()->
                 insert("<%= table_name(model) %>", field2Val,
