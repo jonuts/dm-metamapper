@@ -28,7 +28,6 @@ public:
 
     <%- many_to_one.each do |r| -%> 
     <%- parent = decolonize(parent_name(r)) -%>
-
     T_<%= class_name %>(const I_<%= parent %>& parentId)
     {
         _tables.push_back("<%= storage_name %>");
