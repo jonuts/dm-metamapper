@@ -26,13 +26,16 @@ public:
         _tables.push_back("<%= storage_name %>");
     }
 
+    <%- sigset = Set.new -%>
     <%- many_to_one.each do |r| -%> 
     <%- parent = decolonize(parent_name(r)) -%>
-    T_<%= class_name %>(const I_<%= parent %>& parentId)
+    <%- signature = "T_#{class_name}(const I_#{parent}" -%>
+    <%- sigset.member?(signature) ? next : sigset.add(signature) -%>
+    <%= signature %>& parentId)
     {
         _tables.push_back("<%= storage_name %>");
         
-        _constraint._cond = "(<%= storage_name + "." + get_key_to_parent(r) %> = " + parentId.to_s() + ")";
+        _constraint._cond = "(<%= storage_name.to_s + "." + get_key_to_parent(r).to_s %> = " + parentId.to_s() + ")";
     } 
     <%- end -%>
     

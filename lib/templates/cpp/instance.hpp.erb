@@ -25,9 +25,12 @@ class O_<%= class_name %>{
 public:
 
     O_<%= class_name %>() {}
+    <%- sigset = Set.new -%>
     <%- many_to_one.each do |r| -%>
     <%- parent = decolonize(parent_name(r)) -%>
-    O_<%= class_name %>(const I_<%= parent %>& parent_id) 
+    <%- signature = "O_#{class_name}(const I_#{parent}" -%>
+    <%- sigset.member?(signature) ? next : sigset.add(signature) -%>
+    <%= signature %>& parent_id)
         : _f_<%= get_key_to_parent(r) %>(parent_id)
         {}
     <%- end -%>
