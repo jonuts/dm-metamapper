@@ -311,6 +311,30 @@ DBFace::now()
     return UTILS::toString(mysqlRes[0]["now()"]);
 }
 
+string 
+DBFace::today()
+{
+    return today(0);
+}
+
+string 
+DBFace::today(const int offset)
+{
+    boost::mutex::scoped_lock lock(_mutex);
+    Query q = _connection.query();
+    
+    q << "SELECT ADDDATE(CURDATE()," << std::to_string(offset) << ") AS today";
+    StoreQueryResult mysqlRes;
+    try{
+	mysqlRes = q.store();
+    }
+    catch (const mysqlpp::Exception& er) {
+        cerr << "Query failed: " << q << endl << er.what();
+        return string();
+    }
+    return UTILS::toString(mysqlRes[0]["today"]);
+}
+
 string
 sanitize(const string& s)
 {
