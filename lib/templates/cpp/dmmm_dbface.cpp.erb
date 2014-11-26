@@ -314,16 +314,16 @@ DBFace::now()
 string 
 DBFace::today()
 {
-    return today(0);
+  return days_ago(0);
 }
 
 string 
-DBFace::today(const int offset)
+DBFace::days_ago(const int offset)
 {
     boost::mutex::scoped_lock lock(_mutex);
     Query q = _connection.query();
     
-    q << "SELECT ADDDATE(CURDATE()," << std::to_string(offset) << ") AS today";
+    q << "SELECT ADDDATE(CURDATE()," << std::to_string(offset) << ") AS days_ago";
     StoreQueryResult mysqlRes;
     try{
 	mysqlRes = q.store();
@@ -332,7 +332,7 @@ DBFace::today(const int offset)
         cerr << "Query failed: " << q << endl << er.what();
         return string();
     }
-    return UTILS::toString(mysqlRes[0]["today"]);
+    return UTILS::toString(mysqlRes[0]["days_ago"]);
 }
 
 string
