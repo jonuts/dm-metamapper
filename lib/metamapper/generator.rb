@@ -1,3 +1,4 @@
+
 module MetaMapper
   class Generator
     class << self
@@ -122,3 +123,4 @@ module MetaMapper
   end
 end
 
+require_relative './generators/cpp'

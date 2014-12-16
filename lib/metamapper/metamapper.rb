@@ -12,6 +12,7 @@ module MetaMapper
 
     def generate(format, opts={})
       @models = opts[:models] if opts[:models]
+      opts[:template_dir] ||= File.expand_path("../../templates", __FILE__)
 
       context = opts.delete(:context)
       generator = Generator[format].new(context, opts)
