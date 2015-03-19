@@ -10,7 +10,7 @@ DBFace* DBFace::_this = NULL;
 
 DBFace::DBFace(const string& database, const string& host, 
 	       const string& user, const string& password)
-    : _os(NULL), _host(host), _user(user), _database(database),		
+    : _connection(false), _os(NULL), _host(host), _user(user), _database(database),		
       _password(password)
 {
     _this = this;
@@ -20,7 +20,7 @@ DBFace::DBFace(const string& database, const string& host,
 DBFace::DBFace(const string& database, const string& host, 
                const string& user, const string& password,
                ostream* os)
-    : _os(os), _host(host), _user(user), _database(database),		
+    : _connection(false), _os(os), _host(host), _user(user), _database(database),		
       _password(password)
 {
     _this = this;
@@ -33,22 +33,31 @@ DBFace::connect()
     if (_connection.connected())
         _connection.disconnect();
 
+    if(!_connection.set_option(new mysqlpp::ReconnectOption(true))) {
+        cerr << "DB :: Can't set option to auto-reconnect";
+        if (_os)
+            (*_os) << "DB :: Can't set option to auto-reconnect";
+    }
+    if(!_connection.set_option(new mysqlpp::SetCharsetNameOption("utf8"))) {
+        cerr << "DB :: Can't set CharsetNameOption to utf8";
+        if (_os)
+            (*_os) << "DB :: Can't set CharsetNameOption to utf8";
+    }
     if (!_connection.connect(_database.c_str(), _host.c_str(), 
-			     _user.c_str(), _password.c_str()))
-    {
-	if (_os)
-	    (*_os) << "Could not connect to DB";        
-        cerr << "Could not connect to DB";
+          _user.c_str(), _password.c_str())) {
+        cerr << "DB :: Could not connect to DB";
+        if (_os)
+            (*_os) << "DB :: Could not connect to DB";
     }
 }
 
 string 
-currentDateTime()
+currentTime()
 {
     using namespace boost::posix_time;
     ptime now = second_clock::local_time();
 
-    return to_iso_extended_string(now);
+    return to_simple_string(now.time_of_day());
 }
 
 
@@ -56,7 +65,7 @@ void
 DBFace::log(const string& message)
 {
     if (_os)
-	(*_os) << currentDateTime() << " DMMM " << message << endl;
+	(*_os) << currentTime() << " DMMM " << message << endl;
 }
 
 void
@@ -302,6 +311,30 @@ DBFace::now()
     return UTILS::toString(mysqlRes[0]["now()"]);
 }
 
+string 
+DBFace::today()
+{
+  return days_ago(0);
+}
+
+string 
+DBFace::days_ago(const int offset)
+{
+    boost::mutex::scoped_lock lock(_mutex);
+    Query q = _connection.query();
+    
+    q << "SELECT ADDDATE(CURDATE()," << std::to_string(offset) << ") AS days_ago";
+    StoreQueryResult mysqlRes;
+    try{
+	mysqlRes = q.store();
+    }
+    catch (const mysqlpp::Exception& er) {
+        cerr << "Query failed: " << q << endl << er.what();
+        return string();
+    }
+    return UTILS::toString(mysqlRes[0]["days_ago"]);
+}
+
 string
 sanitize(const string& s)
 {
@@ -313,5 +346,24 @@ sanitize(const string& s)
     return q.str();
 }
 
+void 
+DBFace::startTransaction()
+{
+    Query q = _connection.query();
+    
+    q << "START TRANSACTION";
+    boost::mutex::scoped_lock lock(_mutex);
+    executeQuery(q);
+}
+
+void 
+DBFace::commitTransaction()
+{
+    Query q = _connection.query();
+    
+    q << "COMMIT";
+    boost::mutex::scoped_lock lock(_mutex);
+    executeQuery(q);
+}
 
 } //namespace DMMM

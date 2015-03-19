@@ -18,15 +18,25 @@ module DataMapper
       end
 
       def generate(format, opts = {})
+        @models = opts[:models] if opts[:models]
+        @models = models.select{ |m| m.key.size == 1}
+        
         context = opts.delete(:context)
         generator = Generator[format]
         generator.run(context, opts)
+        
+        models.each {|model|
+          puts "generating #{model}"
 
-        models.each {|model| 
           opts[:context] = model
           generate(format, opts)
         } if !context
       end
+
+      def has_class(klass)
+        @models.count{|m| m.name == klass} == 1
+      end
+
     end
   end
 end

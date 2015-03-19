@@ -15,7 +15,7 @@ public:
     explicit Id(size_t id) : _id(id) {}
     Id() {}
 
-    inline Id operator++() { 
+    inline Id& operator++() {
 	++_id; return *this; 
     }
     
@@ -42,6 +42,13 @@ public:
     }
     inline bool operator!=(const Id& that) const { 
 	return ! (*this == that); 
+    }
+    inline Id& operator=(const size_t& id) {
+        _id = id;
+        return *this;
+    }
+    inline operator size_t() const {
+        return _id;
     }
 
     std::string to_s() const {

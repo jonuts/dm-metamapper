@@ -7,7 +7,7 @@ module DataMapper
         _extended(model)
         DataMapper::MetaMapper.register(model)
         model.instance_variable_set(:@_skipped_generation_formats, [])
-        class <<model; attr_reader :_skipped_generation_formats end
+        class << model; attr_reader :_skipped_generation_formats end
       end
     end
 
@@ -23,12 +23,6 @@ module DataMapper
 
     def generate(format)
       DataMapper::MetaMapper.generate(format, self)
-    end
-
-    def generated_properties
-      @_generated_properties ||= properties.select {|prop|
-        !prop.options[:skip_generation]
-      }
     end
 
   end

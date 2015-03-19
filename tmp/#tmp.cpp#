@@ -1,0 +1,24 @@
+In file included from include/../html/WebPage.h:11:0,
+                 from include/WebPage.h:1,
+                 from include/../db/WebDB.h:7,
+                 from include/WebDB.h:1,
+                 from include/../spider/Spider.h:11,
+                 from include/Spider.h:1,
+                 from main/Main.cpp:11:
+dmmm/O_Account.hpp: In member function ‘
+std::vector<DMMM::O_KeywordGroup> DMMM::O_Account::_keyword_groups() const’:
+dmmm/O_Account.hpp:327:56: error: no match for ‘
+operator==’
+
+ in ‘DMMM::T_KeywordGroup::_account_id()() == DMMM::O_Account::_id()’
+dmmm/O_Account.hpp:327:56: note: candidate is:
+
+dmmm/dmmm_comparators.hpp:9:27: note: typename E::ConditionType DMMM::operator==
+(E, const typename E::ComparerType&) [
+    with E = DMMM::T_KeywordGroup::E_account_id, typename E::ConditionType = DMM
+    M::T_KeywordGroup::Condition, typename E::ComparerType = int]
+
+dmmm/dmmm_comparators.hpp:9:27: note:   no known conversion for argument 2 from 
+‘
+const Base {aka const DMMM::ID::Id<DMMM::DummyO_Account>}’
+ to ‘const ComparerType& {aka const int&}’

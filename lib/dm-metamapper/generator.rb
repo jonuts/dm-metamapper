@@ -60,7 +60,7 @@ module DataMapper
         @model = model
 
         instance_eval(&self.class.setup_model_blk) if model
-
+ 
         @templates = if model
           self.class.generated_files.models
         else
@@ -84,8 +84,8 @@ module DataMapper
         if !File.exists? template.full_path
           raise NoTemplateError, "Template does not exist at path #{template.full_path}"
         end
-
-#        puts "generating " + template.inspect
+        
+        puts "generating " + template.inspect
         compiled = ERB.new(File.read(template.full_path), nil, "%<>-").result(binding)
         path = respond_to?(:output_path) ? output_path(model, template) : template.output_name
         if !File.exists?(path) || File.read(path) != compiled

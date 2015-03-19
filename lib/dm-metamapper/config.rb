@@ -3,7 +3,7 @@ module DataMapper
     class Config < Hash
       def initialize
         super
-        self.merge! DataMapper::MetaMapper._default_opts
+        self.merge! MetaMapper._default_opts
       end
 
       alias_method :use, :merge!

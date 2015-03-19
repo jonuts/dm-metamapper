@@ -12,11 +12,13 @@ module DataMapper
         generates_file :global, "dmmm_dbface.cpp"
         generates_file :global, "dmmm_dbface.h"
         generates_file :global, "dmmm_id.hpp"
-
+        
+       
         generates_file :model, "O_%model%.hpp", :template => "instance.hpp"
         generates_file :model, "T_%model%.hpp", :template => "class.hpp"
 
         setup_model do
+
           enums = {}
           model.properties.each do |prop|
             cpp_name = if prop.serial?
@@ -72,10 +74,11 @@ module DataMapper
             temp = @many_to_one
             @many_to_one = {}
             temp.each{|t| @many_to_one[t.name] = t}
-          end
-
+          end 
+          @many_to_one.select{|k,v| DataMapper::MetaMapper.has_class(v.parent_model_name)}
           @many_to_one
         end
+
         def one_to_many
           return unless model
           @one_to_many ||= model.relationships.select {|m|
@@ -87,9 +90,17 @@ module DataMapper
             @one_to_many = {}
             temp.each{|t| @one_to_many[t.name] = t}
           end
-
+          @one_to_many = @one_to_many.select{|k,v| DataMapper::MetaMapper.has_class(v.child_model_name)}
           @one_to_many
         end
+
+        
+        def generated_properties
+          @generated_properties ||= model.properties.select {|prop|
+            !prop.options[:skip_generation]
+          }
+        end
+
       end
     end
   end

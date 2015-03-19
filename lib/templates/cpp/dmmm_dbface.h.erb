@@ -47,12 +47,18 @@ public:
                  const std::string& where);
 
     std::string now(); 
-    
+    std::string today(); 
+    std::string days_ago(const int offset); 
+
+    void startTransaction();
+    void commitTransaction();
+
 private:
     void log(const std::string& message);
     void logError(const std::string& message);
     bool getLastInsertId(mysqlpp::Query& rQuery, size_t& rId);
     bool executeQuery(mysqlpp::Query& rQuery);
+    
     
 private:
     mysqlpp::Connection                 _connection;

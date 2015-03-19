@@ -1,11 +1,11 @@
 lib = File.expand_path('../lib', __FILE__)
 $:.unshift lib unless $:.include?(lib)
 
-require 'dm-metamapper/version'
+#require 'dm-metamapper/version'
 
 Gem::Specification.new do |s|
-  s.name = %q{dm-metamapper}
-  s.version = DataMapper::MetaMapper::VERSION
+  s.name = %q{metamapper}
+  s.version = "0.0.1"
   s.platform = Gem::Platform::RUBY
 
   s.required_rubygems_version = ">= 1.3.6"
